@@ -8,15 +8,13 @@ datasource db {
 }
 
 enum OrderStatus {
-  ORDER_CREATED // Initial order created (pending payment)
-  PAYMENT_PENDING // Payment initiated, awaiting completion
-  PAYMENT_SUCCESS // Payment successful
-  PAYMENT_FAILED // Payment failed
-  ORDER_CONFIRMED // Order confirmed after payment (stock reduced)
-  SHIPPED // Order shipped
-  DELIVERED // Order delivered
-  CANCELLED // Order cancelled
-  REFUNDED // Order refunded (stock restored)
+  ORDER_CREATED
+  PAYMENT_PENDING
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  ORDER_CONFIRMED
+  SHIPPED
+  DELIVERED
 }
 
 enum UserRole {
