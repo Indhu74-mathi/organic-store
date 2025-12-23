@@ -314,7 +314,7 @@ export async function POST(req: Request) {
       })
     } catch (error) {
       // If transaction failed due to insufficient stock, mark order as PAYMENT_FAILED
-      if (stockError && error === stockError) {
+      if (stockError && error === stockError && stockError instanceof Error) {
         // Mark order as PAYMENT_FAILED (outside transaction since transaction rolled back)
         await prisma.order.update({
           where: { id: order.id },
