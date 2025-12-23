@@ -315,8 +315,9 @@ export async function POST(req: Request) {
     } catch (error) {
       // If transaction failed due to insufficient stock, mark order as PAYMENT_FAILED
       if (stockError && error === stockError) {
-        // TypeScript now knows stockError is Error (not null) due to the check above
-        const errorMessage = stockError instanceof Error ? stockError.message : 'Insufficient stock'
+        // stockError is guaranteed to be an Error instance since we created it with new Error()
+        // Access message property directly since we know it's an Error
+        const errorMessage = (stockError as Error).message || 'Insufficient stock'
         
         // Mark order as PAYMENT_FAILED (outside transaction since transaction rolled back)
         await prisma.order.update({
