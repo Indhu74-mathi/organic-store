@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { hashPassword, createAccessToken, createRefreshToken } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { validateEmail, validateString } from '@/lib/auth/validate-input'
 import {
   checkRateLimit,
@@ -38,9 +38,9 @@ export async function POST(req: Request) {
     const email = validateEmail(rawEmail)
     const password = validateString(rawPassword, {
       minLength: 8,
-      maxLength: 128, // Reasonable limit
+      maxLength: 128,
       required: true,
-      trim: false, // Don't trim passwords
+      trim: false,
     })
 
     if (!email || !password) {
@@ -50,39 +50,49 @@ export async function POST(req: Request) {
       )
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    })
+    // Check if user exists
+    const { data: existingUsers, error: checkError } = await supabase
+      .from('User')
+      .select('id')
+      .eq('email', email)
+      .limit(1)
 
-    if (existingUser) {
-      // SECURITY: Generic message to prevent user enumeration
+    if (checkError) {
+      console.error('[Register] Supabase check error:', checkError)
+      return createErrorResponse('Registration failed', 500)
+    }
+
+    if (existingUsers && existingUsers.length > 0) {
       return createErrorResponse('User already exists', 409)
     }
 
     const passwordHash = await hashPassword(password)
 
-    const user = await prisma.user.create({
-      data: {
-        email, // Already validated and normalized
+    // Create user
+    const { data: newUser, error: createError } = await supabase
+      .from('User')
+      .insert({
+        email,
         passwordHash,
-      },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-      },
-    })
+        role: 'USER',
+      })
+      .select('id, email, role')
+      .single()
+
+    if (createError || !newUser) {
+      console.error('[Register] Supabase create error:', createError)
+      return createErrorResponse('Registration failed', 500)
+    }
 
     // Automatically log in the user after registration
     const accessToken = createAccessToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
+      userId: newUser.id,
+      email: newUser.email,
+      role: newUser.role,
     })
-
     const refreshToken = createRefreshToken({
-      userId: user.id,
-      role: user.role,
+      userId: newUser.id,
+      role: newUser.role,
     })
 
     return NextResponse.json(
@@ -90,18 +100,14 @@ export async function POST(req: Request) {
         success: true,
         accessToken,
         refreshToken,
-        userId: user.id,
-        email: user.email,
-        role: user.role,
+        userId: newUser.id,
+        email: newUser.email,
+        role: newUser.role,
       },
       { status: 201 }
     )
   } catch (error) {
-    // SECURITY: Never leak internal errors to client
-    return createErrorResponse(
-      'Registration failed',
-      500,
-      error
-    )
+    console.error('[Register] Error:', error)
+    return createErrorResponse('Registration failed', 500, error)
   }
 }

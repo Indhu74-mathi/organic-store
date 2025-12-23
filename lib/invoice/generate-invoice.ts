@@ -1,5 +1,40 @@
 import PDFDocument from 'pdfkit'
-import { Order, OrderItem, User } from '@prisma/client'
+
+// Type definitions (no longer from Prisma)
+interface Order {
+  id: string
+  userId: string
+  status: string
+  totalAmount: number
+  currency: string
+  addressLine1: string
+  addressLine2: string | null
+  city: string
+  state: string
+  postalCode: string
+  country: string
+  razorpayPaymentId: string | null
+  paidAt: string | null
+  createdAt: string
+}
+
+interface OrderItem {
+  id: string
+  orderId: string
+  productId: string
+  productName: string
+  unitPrice: number
+  discountPercent: number | null
+  finalPrice: number
+  quantity: number
+  createdAt: string
+}
+
+interface User {
+  id: string
+  email: string
+  role: string
+}
 
 interface InvoiceData {
   order: Order & {
@@ -30,140 +65,87 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<Buff
       })
       doc.on('error', reject)
 
-      // Company/Store Information
-      doc
-        .fontSize(24)
-        .font('Helvetica-Bold')
-        .text('Organic Store', 50, 50)
-        .fontSize(10)
-        .font('Helvetica')
-        .text('123 Organic Street, Green City', 50, 80)
-        .text('Mumbai, Maharashtra 400001', 50, 95)
-        .text('Phone: +91 98765 43210 | Email: info@organicstore.com', 50, 110)
-
-      // Invoice Title
+      // Header
       doc
         .fontSize(20)
         .font('Helvetica-Bold')
-        .text('INVOICE', 50, 150)
+        .text('Millets N Joy', 50, 50)
+        .fontSize(12)
+        .font('Helvetica')
+        .text('Invoice', 50, 80)
 
-      // Order Information
-      const orderDate = new Date(order.createdAt)
-      const formattedDate = orderDate.toLocaleDateString('en-IN', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-
+      // Order Info
+      let yPos = 120
       doc
         .fontSize(10)
-        .font('Helvetica')
-        .text(`Invoice #: ${order.id}`, 400, 150)
-        .text(`Date: ${formattedDate}`, 400, 165)
-        .text(`Order Status: ${order.status}`, 400, 180)
+        .text(`Order ID: ${order.id}`, 50, yPos)
+        .text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, 50, yPos + 15)
 
-      // Customer Information
-      let yPos = 220
+      // Customer Info
+      yPos += 50
       doc
         .fontSize(12)
         .font('Helvetica-Bold')
         .text('Bill To:', 50, yPos)
         .fontSize(10)
         .font('Helvetica')
-        .text(order.user.email, 50, yPos + 20)
-        .text(`User ID: ${order.userId.substring(0, 8)}...`, 50, yPos + 35)
+        .text(order.user.email, 50, yPos + 15)
 
       // Delivery Address
-      yPos += 70
+      yPos += 60
       doc
         .fontSize(12)
         .font('Helvetica-Bold')
-        .text('Ship To:', 50, yPos)
+        .text('Delivery Address:', 50, yPos)
         .fontSize(10)
         .font('Helvetica')
-        .text(order.addressLine1, 50, yPos + 20)
+        .text(order.addressLine1, 50, yPos + 15)
       if (order.addressLine2) {
-        doc.text(order.addressLine2, 50, yPos + 35)
-        yPos += 15
+        doc.text(order.addressLine2, 50, yPos + 30)
       }
       doc
-        .text(
-          `${order.city}, ${order.state} ${order.postalCode}`,
-          50,
-          yPos + 35
-        )
-        .text(order.country, 50, yPos + 50)
+        .text(`${order.city}, ${order.state} ${order.postalCode}`, 50, yPos + 45)
+        .text(order.country, 50, yPos + 60)
 
-      // Table Header
-      yPos += 100
+      // Items Table
+      yPos += 120
+      doc
+        .fontSize(12)
+        .font('Helvetica-Bold')
+        .text('Items', 50, yPos)
+
+      yPos += 20
+      // Table header
       doc
         .fontSize(10)
         .font('Helvetica-Bold')
-        .text('Item', 50, yPos)
-        .text('Quantity', 200, yPos)
-        .text('Unit Price', 280, yPos)
-        .text('Discount', 360, yPos)
-        .text('Amount', 450, yPos)
+        .text('Product', 50, yPos)
+        .text('Qty', 200, yPos)
+        .text('Price', 250, yPos)
+        .text('Amount', 350, yPos)
 
-      // Draw line under header
+      yPos += 20
       doc
-        .moveTo(50, yPos + 15)
-        .lineTo(550, yPos + 15)
+        .moveTo(50, yPos)
+        .lineTo(550, yPos)
         .stroke()
 
-      // Order Items
-      yPos += 25
-      let subtotal = 0
+      yPos += 10
 
-      order.items.forEach((item) => {
-        const unitPriceInRupees = item.unitPrice / 100
-        const itemSubtotal = item.finalPrice / 100
-        const discountPercent = item.discountPercent ?? 0
-        const originalPrice = discountPercent > 0
-          ? unitPriceInRupees / (1 - discountPercent / 100)
-          : unitPriceInRupees
+      // Items
+      doc.font('Helvetica')
+      for (const item of order.items) {
+        const unitPrice = item.unitPrice / 100
+        const finalPrice = item.finalPrice / 100
 
-        // Product name (may wrap)
         doc
-          .fontSize(9)
-          .font('Helvetica')
           .text(item.productName, 50, yPos, { width: 140 })
+          .text(item.quantity.toString(), 200, yPos)
+          .text(`₹${unitPrice.toFixed(2)}`, 250, yPos)
+          .text(`₹${finalPrice.toFixed(2)}`, 350, yPos)
 
-        // Quantity
-        doc.text(item.quantity.toString(), 200, yPos)
-
-        // Unit Price
-        if (discountPercent > 0) {
-          doc
-            .text(`₹${originalPrice.toFixed(2)}`, 280, yPos)
-            .fontSize(8)
-            .fillColor('gray')
-            .text(`₹${unitPriceInRupees.toFixed(2)}`, 280, yPos + 12)
-            .fontSize(9)
-            .fillColor('black')
-        } else {
-          doc.text(`₹${unitPriceInRupees.toFixed(2)}`, 280, yPos)
-        }
-
-        // Discount
-        if (discountPercent > 0) {
-          doc.text(`${discountPercent}%`, 360, yPos)
-        } else {
-          doc.text('-', 360, yPos)
-        }
-
-        // Amount
-        doc.text(`₹${itemSubtotal.toFixed(2)}`, 450, yPos)
-
-        subtotal += itemSubtotal
-        yPos += 30
-
-        // Check if we need a new page
-        if (yPos > 700) {
-          doc.addPage()
-          yPos = 50
-        }
-      })
+        yPos += 20
+      }
 
       // Price Breakdown
       yPos += 20
@@ -175,6 +157,7 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<Buff
       yPos += 15
 
       // Subtotal
+      const subtotal = order.totalAmount / 100
       doc
         .fontSize(10)
         .font('Helvetica')
@@ -184,8 +167,7 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<Buff
       yPos += 20
 
       // Tax (GST 18%)
-      // Calculate tax based on subtotal
-      const taxRate = 0.18 // 18% GST
+      const taxRate = 0.18
       const taxAmount = subtotal * taxRate
       doc
         .text(`GST (18%):`, 400, yPos)
@@ -193,64 +175,29 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<Buff
 
       yPos += 20
 
-      // Total - Use order totalAmount as source of truth
-      const orderTotalInRupees = order.totalAmount / 100
-      const calculatedTotal = subtotal + taxAmount
-      
-      // If calculated total matches order total (within rounding), use calculated
-      // Otherwise, use order total and adjust tax display if needed
-      const totalToShow = Math.abs(orderTotalInRupees - calculatedTotal) < 0.01 
-        ? calculatedTotal 
-        : orderTotalInRupees
-
+      // Total
+      const total = subtotal + taxAmount
       doc
         .fontSize(12)
         .font('Helvetica-Bold')
         .text('Total:', 400, yPos)
-        .text(`₹${totalToShow.toFixed(2)}`, 450, yPos)
+        .text(`₹${total.toFixed(2)}`, 450, yPos)
 
-      // Payment Information
+      // Payment Info
       yPos += 40
-      if (order.paidAt) {
-        const paidDate = new Date(order.paidAt)
+      if (order.razorpayPaymentId) {
         doc
           .fontSize(10)
           .font('Helvetica')
-          .text(
-            `Payment Date: ${paidDate.toLocaleDateString('en-IN', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}`,
-            50,
-            yPos
-          )
+          .text(`Payment ID: ${order.razorpayPaymentId.substring(0, 20)}...`, 50, yPos)
+      }
+      if (order.paidAt) {
+        doc.text(`Paid: ${new Date(order.paidAt).toLocaleString()}`, 50, yPos + 15)
       }
 
-      // Footer
-      const pageHeight = doc.page.height
-      doc
-        .fontSize(8)
-        .font('Helvetica')
-        .fillColor('gray')
-        .text(
-          'Thank you for your business!',
-          50,
-          pageHeight - 50,
-          { align: 'center', width: 500 }
-        )
-        .text(
-          'This is a computer-generated invoice and does not require a signature.',
-          50,
-          pageHeight - 35,
-          { align: 'center', width: 500 }
-        )
-
-      // Finalize PDF
       doc.end()
     } catch (error) {
       reject(error)
     }
   })
 }
-

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { createErrorResponse } from '@/lib/auth/api-auth'
 
 /**
@@ -16,19 +16,26 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const product = await prisma.product.findUnique({
-      where: {
-        slug: params.slug,
-        isActive: true,
-      },
-    })
+    const { data: products, error } = await supabase
+      .from('Product')
+      .select('*')
+      .eq('slug', params.slug)
+      .eq('isActive', true)
+      .limit(1)
 
-    if (!product) {
+    if (error) {
+      console.error('[API Products Slug] Supabase error:', error)
+      throw new Error(`Database query failed: ${error.message}`)
+    }
+
+    if (!products || products.length === 0) {
       return NextResponse.json(
         { error: 'Product not found' },
         { status: 404 }
       )
     }
+
+    const product = products[0]
 
     return NextResponse.json({
       product: {
@@ -46,7 +53,7 @@ export async function GET(
       },
     })
   } catch (error) {
+    console.error('[API Products Slug] Error:', error)
     return createErrorResponse('Failed to fetch product', 500, error)
   }
 }
-

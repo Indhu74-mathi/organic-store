@@ -1,36 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { requireAuth, createErrorResponse, unauthorizedResponse } from '@/lib/auth/api-auth'
 import { validateString } from '@/lib/auth/validate-input'
 
 /**
  * GET /api/orders/[orderId]
  * 
- * Fetch specific order details.
- * 
- * SECURITY:
- * - Verify order belongs to authenticated user
- * - Return full order + payment status
- * - Never expose internal IDs or secrets
- * 
- * Returns full order details including:
- * - Order information
- * - Items
- * - Address
- * - Payment status (masked)
+ * Fetch a single order by ID for the authenticated user.
  */
 export async function GET(
   req: NextRequest,
   { params }: { params: { orderId: string } }
 ) {
   try {
-    // SECURITY: Require authentication - never trust request body for userId
     const user = requireAuth(req)
     if (!user) {
       return unauthorizedResponse()
     }
 
-    // SECURITY: Validate orderId format
     const orderId = validateString(params.orderId, {
       minLength: 1,
       maxLength: 100,
@@ -42,81 +29,89 @@ export async function GET(
       return createErrorResponse('Invalid order ID', 400)
     }
 
-    // SECURITY: Fetch order - ALWAYS scope by authenticated userId
-    // This ensures one user can NEVER see another user's order
-    const order = await prisma.order.findFirst({
-      where: {
-        id: orderId,
-        userId: user.userId, // CRITICAL: Ensure order belongs to authenticated user
-      },
-      include: {
-        items: {
-          select: {
-            productId: true,
-            productName: true,
-            quantity: true,
-            unitPrice: true,
-            discountPercent: true,
-            finalPrice: true,
-          },
-        },
-      },
-    })
+    // Fetch order
+    const { data: orders, error: orderError } = await supabase
+      .from('Order')
+      .select('*')
+      .eq('id', orderId)
+      .eq('userId', user.userId)
+      .limit(1)
 
-    if (!order) {
-      // SECURITY: Generic message prevents order enumeration
+    if (orderError) {
+      console.error('[API Order Detail] Supabase error:', orderError)
+      return createErrorResponse('Failed to fetch order', 500)
+    }
+
+    if (!orders || orders.length === 0) {
       return createErrorResponse('Order not found', 404)
     }
 
-    // SECURITY: Mask sensitive payment data
-    // Never expose full payment IDs or signatures to frontend
-    const safeOrder = {
-      orderId: order.id,
-      status: order.status,
-      totalAmount: order.totalAmount,
-      currency: order.currency,
-      createdAt: order.createdAt,
-      updatedAt: order.updatedAt,
-      paidAt: order.paidAt,
-      // Delivery address
-      address: {
-        line1: order.addressLine1,
-        line2: order.addressLine2,
+    const order = orders[0]
+
+    // Fetch order items
+    const { data: orderItems, error: itemsError } = await supabase
+      .from('OrderItem')
+      .select('*')
+      .eq('orderId', orderId)
+
+    if (itemsError) {
+      console.error('[API Order Detail] Items error:', itemsError)
+      return createErrorResponse('Failed to fetch order items', 500)
+    }
+
+    // Map response
+    const mappedItems = (orderItems || []).map((item) => ({
+      id: item.id,
+      productId: item.productId,
+      productName: item.productName,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice / 100,
+      discountPercent: item.discountPercent,
+      finalPrice: item.finalPrice / 100,
+    }))
+
+    return NextResponse.json({
+      order: {
+        id: order.id,
+        status: order.status,
+        totalAmount: order.totalAmount / 100,
+        currency: order.currency,
+        addressLine1: order.addressLine1,
+        addressLine2: order.addressLine2,
         city: order.city,
         state: order.state,
         postalCode: order.postalCode,
         country: order.country,
+        razorpayPaymentId: order.razorpayPaymentId,
+        paidAt: order.paidAt,
+        createdAt: order.createdAt,
+        items: mappedItems,
+        paymentStatus: getPaymentStatus(order.status),
       },
-      // Order items with discount information
-      items: order.items.map((item) => ({
-        productId: item.productId,
-        productName: item.productName,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice, // Price at purchase (already discounted)
-        discountPercent: item.discountPercent ?? 0, // Discount percentage at time of order
-        finalPrice: item.finalPrice, // Final price (unitPrice * quantity) at time of order
-        subtotal: item.finalPrice, // Use finalPrice as subtotal (already includes discount)
-      })),
-      // Payment status (masked - never expose full payment IDs or signatures)
-      paymentStatus: ['ORDER_CONFIRMED', 'PAYMENT_SUCCESS'].includes(order.status) ? 'paid' 
-        : order.status === 'CANCELLED' ? 'cancelled' 
-        : ['PAYMENT_PENDING', 'ORDER_CREATED'].includes(order.status) ? 'pending'
-        : 'unknown',
-      hasPayment: !!order.razorpayPaymentId,
-      // Only show if payment exists (don't expose full ID)
-      paymentId: order.razorpayPaymentId ? `${order.razorpayPaymentId.substring(0, 8)}...` : null,
-    }
-
-    return NextResponse.json({
-      order: safeOrder,
     })
   } catch (error) {
-    // SECURITY: Never leak internal errors to client
-    return createErrorResponse(
-      'Failed to fetch order',
-      500,
-      error
-    )
+    console.error('[API Order Detail] Error:', error)
+    return createErrorResponse('Failed to fetch order', 500, error)
   }
 }
 
+function getPaymentStatus(status: string): string {
+  switch (status) {
+    case 'PAYMENT_SUCCESS':
+    case 'ORDER_CONFIRMED':
+    case 'SHIPPED':
+    case 'DELIVERED':
+      return 'paid'
+    case 'PAYMENT_PENDING':
+    case 'ORDER_CREATED':
+      return 'pending'
+    case 'PAYMENT_FAILED':
+      return 'failed'
+    case 'CANCELLED':
+      return 'cancelled'
+    case 'REFUNDED':
+      return 'refunded'
+    default:
+      return 'unknown'
+  }
+}

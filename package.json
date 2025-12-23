@@ -4,20 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@supabase/supabase-js": "^2.89.0",
     "@types/pdfkit": "^0.17.4",
     "bcrypt": "^6.0.0",
     "framer-motion": "^12.23.26",
     "jsonwebtoken": "^9.0.3",
     "next": "14.2.35",
     "pdfkit": "^0.17.2",
-    "prisma": "^5.22.0",
     "razorpay": "^2.9.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

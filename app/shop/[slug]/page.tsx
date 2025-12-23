@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import ProductDetailPageContent from '@/components/shop/ProductDetailPageContent'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 
 interface ProductSlugPageProps {
@@ -12,12 +12,14 @@ interface ProductSlugPageProps {
 export async function generateMetadata({
   params,
 }: ProductSlugPageProps): Promise<Metadata> {
-  const product = await prisma.product.findUnique({
-    where: {
-      slug: params.slug,
-      isActive: true,
-    },
-  })
+  const { data: products } = await supabase
+    .from('Product')
+    .select('*')
+    .eq('slug', params.slug)
+    .eq('isActive', true)
+    .limit(1)
+
+  const product = products && products.length > 0 ? products[0] : null
 
   if (!product) {
     return {
@@ -28,11 +30,7 @@ export async function generateMetadata({
   }
 
   const baseTitle = `${product.name} | Millets N Joy`
-
-  const description =
-    product.description.length > 150
-      ? `${product.description.slice(0, 147)}...`
-      : product.description
+  const description = product.description || `Buy ${product.name} at Millets N Joy`
 
   return {
     title: baseTitle,
@@ -40,28 +38,26 @@ export async function generateMetadata({
     openGraph: {
       title: baseTitle,
       description,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: baseTitle,
-      description,
+      images: product.imageUrl ? [product.imageUrl] : [],
     },
   }
 }
 
 export default async function ProductSlugPage({ params }: ProductSlugPageProps) {
-  const product = await prisma.product.findUnique({
-    where: {
-      slug: params.slug,
-      isActive: true,
-    },
-  })
+  const { data: products } = await supabase
+    .from('Product')
+    .select('*')
+    .eq('slug', params.slug)
+    .eq('isActive', true)
+    .limit(1)
+
+  const product = products && products.length > 0 ? products[0] : null
 
   if (!product) {
     notFound()
   }
 
-  // Map database product to Product type
+  // Map to Product type expected by component
   const mappedProduct = {
     id: product.id,
     slug: product.slug,
@@ -72,10 +68,8 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
     category: product.category,
     image: product.imageUrl,
     inStock: product.stock > 0,
-    stock: product.stock, // Include stock for low stock warnings
+    stock: product.stock,
   }
 
   return <ProductDetailPageContent product={mappedProduct} />
 }
-
-

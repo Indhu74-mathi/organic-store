@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { verifyPassword, createAccessToken, createRefreshToken } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { supabase } from '@/lib/supabase'
 import { validateEmail } from '@/lib/auth/validate-input'
 import {
   checkRateLimit,
@@ -47,74 +47,64 @@ export async function POST(req: Request) {
       return createErrorResponse('Invalid email or password', 401)
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        email: true,
-        passwordHash: true,
-        role: true,
-      },
-    })
+    // Fetch user from Supabase
+    const { data: users, error: userError } = await supabase
+      .from('User')
+      .select('*')
+      .eq('email', email)
+      .limit(1)
 
-    // SECURITY: Generic message prevents user enumeration
-    // Always perform password verification to prevent timing attacks
-    const isValid = user
-      ? await verifyPassword(password, user.passwordHash)
-      : false
+    if (userError) {
+      console.error('[Login] Supabase error:', userError)
+      recordLoginFailure(clientId)
+      return createErrorResponse('Invalid email or password', 401)
+    }
 
-    if (!user || !isValid) {
-      // SECURITY: Record failed login attempt for exponential backoff
-      const { delayMs } = recordLoginFailure(clientId)
-      if (delayMs > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs))
-      }
+    if (!users || users.length === 0) {
+      recordLoginFailure(clientId)
+      // SECURITY: Generic message prevents user enumeration
+      return createErrorResponse('Invalid email or password', 401)
+    }
 
-      // SECURITY: Consistent response timing to prevent timing attacks
-      const elapsed = Date.now() - startTime
-      const minDelay = 500 // Minimum 500ms response time
-      if (elapsed < minDelay) {
-        await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed))
-      }
+    const user = users[0]
 
+    // SECURITY: Verify password
+    const isValidPassword = await verifyPassword(password, user.passwordHash)
+    if (!isValidPassword) {
+      recordLoginFailure(clientId)
+      // SECURITY: Generic message prevents user enumeration
       return createErrorResponse('Invalid email or password', 401)
     }
 
     // SECURITY: Clear login failures on successful login
     clearLoginFailures(clientId)
 
+    // SECURITY: Generate tokens
     const accessToken = createAccessToken({
       userId: user.id,
       email: user.email,
       role: user.role,
     })
-
     const refreshToken = createRefreshToken({
       userId: user.id,
       role: user.role,
     })
 
-    // SECURITY: Consistent response timing
-    const elapsed = Date.now() - startTime
-    const minDelay = 200 // Minimum 200ms response time
-    if (elapsed < minDelay) {
-      await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed))
-    }
+    const responseTime = Date.now() - startTime
+    console.log(`[Login] User ${user.email} logged in successfully (${responseTime}ms)`)
 
     return NextResponse.json({
       success: true,
       accessToken,
       refreshToken,
-      userId: user.id,
-      email: user.email,
-      role: user.role,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
     })
   } catch (error) {
-    // SECURITY: Never leak internal errors to client
-    return createErrorResponse(
-      'Login failed',
-      500,
-      error
-    )
+    console.error('[Login] Error:', error)
+    return createErrorResponse('Login failed', 500, error)
   }
 }
