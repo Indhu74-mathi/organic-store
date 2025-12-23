@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { createErrorResponse } from '@/lib/auth/api-auth'
 
 /**
  * GET /api/cart
