@@ -1,0 +1,269 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent browser swipe navigation on carousel */
+#products {
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+}
+
+@keyframes carousel-scroll-seamless {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Move exactly one full set width for seamless loop */
+    transform: translateX(calc(-33.333%));
+  }
+}
+
+.carousel-item {
+  /* Dynamic scaling based on viewport center */
+  transform-origin: center center;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+/* Scale items based on their position relative to viewport center */
+.carousel-item {
+  opacity: 0.6;
+  transform: scale(0.9);
+}
+
+/* Use JavaScript to dynamically apply center scaling, but provide base styles */
+@media (prefers-reduced-motion: no-preference) {
+  .carousel-item {
+    will-change: transform, opacity;
+  }
+}
+
+@layer base {
+  :root {
+    /* Organic theme color variables - Ambient light approach */
+    --color-organic-bg: #F6FBF7; /* Very soft neutral green base */
+    --color-organic-bg-alt: #F4FAF6;
+    --color-organic-accent: #4CAF50;
+    --color-organic-soft: #A8D5BA;
+    --color-organic-border: rgba(76, 175, 80, 0.06); /* Very subtle borders */
+    --color-organic-hover-glow: rgba(76, 175, 80, 0.08); /* Hover glow */
+    --color-organic-shadow: rgba(76, 175, 80, 0.06); /* Soft shadows */
+    --color-organic-text-dark: #2d6d31;
+  }
+
+  * {
+    border-color: var(--color-organic-border);
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply text-neutral-900 antialiased;
+    @apply transition-colors duration-400;
+    background: 
+      radial-gradient(
+        1200px 500px at 50% -10%,
+        rgba(168, 213, 186, 0.35) 0%,
+        rgba(168, 213, 186, 0.20) 25%,
+        rgba(168, 213, 186, 0.15) 50%,
+        rgba(168, 213, 186, 0.08) 75%,
+        rgba(246, 251, 247, 0) 100%
+      ),
+      linear-gradient(
+        180deg,
+        #F6FBF7 0%,
+        #F8FCF9 35%,
+        #FAFDFB 60%,
+        #FFFFFF 100%
+      );
+    background-attachment: fixed;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+  }
+
+  /* Ensure main content is above the gradient */
+  main {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Enhanced typography hierarchy */
+  h1 {
+    @apply text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl lg:text-6xl;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold tracking-tight text-neutral-900 sm:text-4xl;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl;
+    line-height: 1.3;
+  }
+
+  p {
+    @apply text-base leading-relaxed text-neutral-700;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    @apply transition-all duration-300 ease-smooth;
+  }
+
+  /* Hover glow for interactive elements - soft aura effect */
+  a:hover:not([class*="bg-primary"]):not([class*="bg-neutral"]),
+  button:hover:not([class*="bg-primary"]):not([class*="bg-neutral"]) {
+    box-shadow: 0 0 0 2px var(--color-organic-hover-glow);
+  }
+
+  /* Hover glow effect - soft green aura, not background fill */
+  article:hover,
+  .card:hover {
+    box-shadow: 0 0 0 2px var(--color-organic-hover-glow), 0 6px 20px var(--color-organic-shadow);
+  }
+
+  /* Focus styles for accessibility */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+    --tw-ring-offset-color: var(--color-organic-bg);
+  }
+}
+
+@layer utilities {
+  /* Organic theme utilities - Ambient approach */
+  .bg-organic {
+    background-color: var(--color-organic-bg);
+  }
+
+  .bg-organic-alt {
+    background-color: var(--color-organic-bg-alt);
+  }
+
+  .border-organic {
+    border-color: var(--color-organic-border);
+  }
+
+  /* Hover glow utility - soft green aura */
+  .hover-organic-glow {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .hover-organic-glow:hover {
+    box-shadow: 0 0 0 2px var(--color-organic-hover-glow), 0 6px 20px var(--color-organic-shadow);
+  }
+
+  /* Soft green shadow utility */
+  .shadow-organic {
+    box-shadow: 0 6px 20px var(--color-organic-shadow);
+  }
+
+  /* Custom utility classes for premium aesthetic */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Smooth fade transitions */
+  .transition-fade {
+    @apply transition-opacity duration-400 ease-smooth;
+  }
+
+  /* Smooth transform transitions */
+  .transition-transform-smooth {
+    @apply transition-transform duration-400 ease-out-cubic;
+  }
+
+  /* Animation-ready classes for future use */
+  .animate-ready {
+    @apply transition-all duration-400 ease-smooth;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out-cubic forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Product image utility - ensures images are never cropped */
+  .product-image {
+    object-fit: contain;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+
+  /* Product detail page image - fully visible without scrolling */
+  .product-detail-image {
+    object-fit: contain;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 55vh; /* Mobile portrait */
+  }
+
+  @media (min-width: 640px) {
+    .product-detail-image {
+      max-height: 60vh; /* Tablet */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .product-detail-image {
+      max-height: 70vh; /* Desktop */
+    }
+  }
+
+  /* Product detail image container - ensures proper centering and no overflow */
+  .product-detail-image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height: 55vh; /* Mobile portrait */
+    overflow: hidden;
+  }
+
+  @media (min-width: 640px) {
+    .product-detail-image-container {
+      max-height: 60vh; /* Tablet */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .product-detail-image-container {
+      max-height: 70vh; /* Desktop */
+    }
+  }
+}

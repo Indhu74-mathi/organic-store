@@ -1,0 +1,90 @@
+import { Product } from '@/types'
+
+/**
+ * Dummy product data for the home page
+ * Replace with actual API calls or database queries later
+ */
+export const featuredProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Organic Fresh Strawberries',
+    description: 'Sweet, juicy strawberries grown without pesticides',
+    price: 8.99,
+    originalPrice: 12.99,
+    category: 'Fruits',
+    image: '/placeholder-product-1.jpg',
+    inStock: true,
+    rating: 4.8,
+  },
+  {
+    id: '2',
+    name: 'Farm Fresh Organic Eggs',
+    description: 'Free-range eggs from pasture-raised hens',
+    price: 6.49,
+    category: 'Dairy',
+    image: '/placeholder-product-2.jpg',
+    inStock: true,
+    rating: 4.9,
+  },
+  {
+    id: '3',
+    name: 'Organic Baby Spinach',
+    description: 'Tender, nutrient-rich baby spinach leaves',
+    price: 4.99,
+    category: 'Vegetables',
+    image: '/placeholder-product-3.jpg',
+    inStock: true,
+    rating: 4.7,
+  },
+  {
+    id: '4',
+    name: 'Organic Whole Wheat Bread',
+    description: 'Artisan bread made with organic whole wheat flour',
+    price: 5.99,
+    category: 'Bakery',
+    image: '/placeholder-product-4.jpg',
+    inStock: true,
+    rating: 4.6,
+  },
+  {
+    id: '5',
+    name: 'Organic Honey',
+    description: 'Pure, raw honey from local organic beekeepers',
+    price: 12.99,
+    category: 'Pantry',
+    image: '/placeholder-product-5.jpg',
+    inStock: true,
+    rating: 4.9,
+  },
+  {
+    id: '6',
+    name: 'Organic Avocados',
+    description: 'Creamy, perfectly ripe organic avocados',
+    price: 7.99,
+    category: 'Fruits',
+    image: '/placeholder-product-6.jpg',
+    inStock: true,
+    rating: 4.8,
+  },
+  {
+    id: '7',
+    name: 'Organic Quinoa',
+    description: 'Premium organic quinoa, protein-rich superfood',
+    price: 9.99,
+    category: 'Grains',
+    image: '/placeholder-product-7.jpg',
+    inStock: true,
+    rating: 4.7,
+  },
+  {
+    id: '8',
+    name: 'Organic Greek Yogurt',
+    description: 'Creamy, protein-packed organic Greek yogurt',
+    price: 5.49,
+    category: 'Dairy',
+    image: '/placeholder-product-8.jpg',
+    inStock: true,
+    rating: 4.8,
+  },
+]
+

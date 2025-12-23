@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  ORDER_CREATED // Initial order created (pending payment)
+  PAYMENT_PENDING // Payment initiated, awaiting completion
+  PAYMENT_SUCCESS // Payment successful
+  PAYMENT_FAILED // Payment failed
+  ORDER_CONFIRMED // Order confirmed after payment (stock reduced)
+  SHIPPED // Order shipped
+  DELIVERED // Order delivered
+  CANCELLED // Order cancelled
+  REFUNDED // Order refunded (stock restored)
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(USER)
+  carts        Cart[]
+  orders       Order[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Cart {
+  id        String     @id
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+}
+
+model Order {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  status OrderStatus @default(ORDER_CREATED)
+
+  totalAmount Int // Stored in smallest currency unit (e.g., paise for INR)
+  currency    String @default("INR")
+
+  // Delivery address (immutable snapshot)
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  postalCode   String
+  country      String  @default("IN")
+
+  // Payment metadata (Razorpay)
+  razorpayOrderId   String? // Razorpay order ID (created when payment initiated)
+  razorpayPaymentId String? // Razorpay payment ID (after successful payment)
+  razorpaySignature String? // Razorpay signature (for verification)
+  paidAt            DateTime? // Timestamp when payment was verified
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([razorpayOrderId])
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId       String
+  productName     String // Snapshot of product name at time of order
+  unitPrice       Int // Snapshot of unit price in smallest currency unit (priceAtPurchase)
+  discountPercent Int? // Snapshot of discount percentage at time of order
+  finalPrice      Int // Snapshot of final price (unitPrice * quantity) at time of order
+  quantity        Int
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String
+  price           Int // Stored in smallest currency unit (e.g., paise for INR)
+  discountPercent Int?     @default(0) // Discount percentage (0-100)
+  imageUrl        String
+  category        String
+  isActive        Boolean  @default(true) // false = hidden from shop
+  stock           Int      @default(0) // Available inventory
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@index([slug])
+}
