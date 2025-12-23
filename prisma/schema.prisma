@@ -125,6 +125,7 @@ model Product {
   @@index([category])
   @@index([isActive])
   @@index([slug])
+  @@map("product")
 }
 
 generator client {
