@@ -55,9 +55,11 @@ export default function CartDrawer() {
       return
     }
 
+    setIsCheckingOut(true)
+
     // Store selected cart item IDs in sessionStorage to pass to checkout page
     sessionStorage.setItem('checkoutCartItemIds', JSON.stringify(selectedCartItemIds))
-      close()
+    close()
 
     // Redirect to checkout review page
     router.push('/checkout')
