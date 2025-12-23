@@ -12,6 +12,8 @@ enum OrderStatus {
   ORDER_CONFIRMED
   SHIPPED
   DELIVERED
+  CANCELLED
+  REFUNDED
 }
 
 enum UserRole {
