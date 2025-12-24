@@ -1,48 +1,41 @@
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
+import { requireAuth } from './api-auth'
 
 /**
- * Get authenticated user from Supabase session
+ * Get authenticated user from Supabase session or Bearer token
  * 
- * @param _req - Request object (optional, for compatibility)
+ * This function supports both:
+ * 1. Supabase session (via cookies) - for future use
+ * 2. Bearer token (current implementation) - for API routes
+ * 
+ * @param req - Request object (optional, for compatibility)
  * @returns User info if authenticated, null otherwise
  */
-export async function getSupabaseUser(_req?: Request): Promise<{
+export async function getSupabaseUser(req?: Request): Promise<{
   id: string
   email: string
   role?: string
 } | null> {
   try {
-    const supabase = createClient()
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser()
+    // For now, fall back to Bearer token auth since we're not using cookies yet
+    // In the future, we can add cookie-based session support here
+    const tokenUser = requireAuth(req || new Request('http://localhost'))
+    if (tokenUser) {
+      // Fetch user role from User table using admin client
+      const { data: userProfile } = await supabaseAdmin
+        .from('User')
+        .select('role')
+        .eq('id', tokenUser.userId)
+        .single()
 
-    if (error || !user) {
-      return null
-    }
-
-    // Fetch user role from User table
-    const { data: userProfile, error: profileError } = await supabase
-      .from('User')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profileError || !userProfile) {
-      // User exists in auth but not in User table - default to USER
       return {
-        id: user.id,
-        email: user.email || '',
-        role: 'USER',
+        id: tokenUser.userId,
+        email: tokenUser.email || '',
+        role: userProfile?.role || tokenUser.role || 'USER',
       }
     }
 
-    return {
-      id: user.id,
-      email: user.email || '',
-      role: userProfile.role || 'USER',
-    }
+    return null
   } catch {
     return null
   }
@@ -79,4 +72,3 @@ export async function requireSupabaseAdmin(_req?: Request): Promise<{
   }
   return user
 }
-

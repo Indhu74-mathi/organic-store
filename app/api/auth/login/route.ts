@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { validateEmail } from '@/lib/auth/validate-input'
 import {
   checkRateLimit,
@@ -46,22 +46,32 @@ export async function POST(req: Request) {
       return createErrorResponse('Invalid email or password', 401)
     }
 
-    const supabase = createClient()
-
-    // Sign in with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    // Sign in with Supabase Auth using admin client
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
       email,
       password,
     })
 
-    if (authError || !authData.user) {
+    if (authError) {
+      console.error('[Login] Supabase auth error:', authError)
+      
+      if (authError.message.includes('Invalid API key') || authError.message.includes('URL and Key')) {
+        console.error('[Login] Configuration error - check environment variables')
+        return createErrorResponse('Server configuration error', 500)
+      }
+      
       recordLoginFailure(clientId)
       // SECURITY: Generic message prevents user enumeration
       return createErrorResponse('Invalid email or password', 401)
     }
 
+    if (!authData.user) {
+      recordLoginFailure(clientId)
+      return createErrorResponse('Invalid email or password', 401)
+    }
+
     // Fetch user role from User table
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: userProfile, error: profileError } = await supabaseAdmin
       .from('User')
       .select('role')
       .eq('id', authData.user.id)
@@ -70,7 +80,7 @@ export async function POST(req: Request) {
     // If user doesn't exist in User table, create it
     if (profileError && profileError.code === 'PGRST116') {
       // User not found in User table - create it
-      const { error: createError } = await supabase
+      const { error: createError } = await supabaseAdmin
         .from('User')
         .insert({
           id: authData.user.id,
@@ -108,6 +118,7 @@ export async function POST(req: Request) {
     })
   } catch (error) {
     console.error('[Login] Error:', error)
-    return createErrorResponse('Login failed', 500, error)
+    const errorMessage = error instanceof Error ? error.message : 'Login failed'
+    return createErrorResponse(errorMessage, 500, error)
   }
 }

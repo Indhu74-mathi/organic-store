@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { validateEmail, validateString } from '@/lib/auth/validate-input'
 import {
   checkRateLimit,
@@ -49,10 +49,8 @@ export async function POST(req: Request) {
       )
     }
 
-    const supabase = createClient()
-
-    // Sign up with Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // Sign up with Supabase Auth using admin client
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
       email,
       password,
     })
@@ -61,19 +59,31 @@ export async function POST(req: Request) {
       console.error('[Register] Supabase auth error:', authError)
       
       // Handle specific Supabase errors
-      if (authError.message.includes('already registered') || authError.message.includes('already exists')) {
+      if (
+        authError.message.includes('already registered') ||
+        authError.message.includes('already exists') ||
+        authError.message.includes('User already registered')
+      ) {
         return createErrorResponse('User already exists', 409)
       }
       
-      return createErrorResponse('Registration failed', 500)
+      if (authError.message.includes('Invalid API key') || authError.message.includes('URL and Key')) {
+        console.error('[Register] Configuration error - check environment variables')
+        return createErrorResponse('Server configuration error', 500)
+      }
+      
+      return createErrorResponse(
+        authError.message || 'Registration failed',
+        400
+      )
     }
 
     if (!authData.user) {
-      return createErrorResponse('Registration failed', 500)
+      return createErrorResponse('Registration failed: No user returned', 500)
     }
 
     // Create user profile in User table
-    const { error: profileError } = await supabase
+    const { error: profileError } = await supabaseAdmin
       .from('User')
       .insert({
         id: authData.user.id,
@@ -107,6 +117,7 @@ export async function POST(req: Request) {
     )
   } catch (error) {
     console.error('[Register] Error:', error)
-    return createErrorResponse('Registration failed', 500, error)
+    const errorMessage = error instanceof Error ? error.message : 'Registration failed'
+    return createErrorResponse(errorMessage, 500, error)
   }
 }
