@@ -75,6 +75,5 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
     inStock: product.isActive && product.stock > 0, // SAME logic as cart
     stock: product.stock, // SAME as cart
   }
-
   return <ProductDetailPageContent product={mappedProduct} />
 }

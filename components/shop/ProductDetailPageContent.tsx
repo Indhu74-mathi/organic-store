@@ -88,17 +88,6 @@ export default function ProductDetailPageContent({
               <p className="text-sm leading-relaxed text-neutral-700 sm:text-base">
                 {product.description}
               </p>
-              <p className="text-sm leading-relaxed text-neutral-700 sm:text-base">
-                Every item in our collection is sourced from trusted organic farms and
-                producers that share our commitment to clean, responsible food. We verify
-                growing practices, ingredients, and handling at every step.
-              </p>
-              <p className="text-sm leading-relaxed text-neutral-700 sm:text-base">
-                Your order is carefully packed in temperature-conscious packaging and
-                shipped quickly to preserve natural freshness, texture, and flavor—so
-                what arrives at your door is as close as possible to how it left the
-                farm.
-              </p>
             </div>
 
             <div className="space-y-2">

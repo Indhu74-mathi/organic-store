@@ -30,7 +30,7 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
   const [showAddForm, setShowAddForm] = useState(false)
   const [isActivating, setIsActivating] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
-  const [editing, setEditing] = useState<{ productId: string; field: 'name' | 'price' | 'stock' | 'discount' } | null>(null)
+  const [editing, setEditing] = useState<{ productId: string; field: 'name' | 'description' | 'price' | 'stock' | 'discount' } | null>(null)
 
   useEffect(() => {
     if (!accessToken) return
@@ -118,7 +118,7 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
 
   const handleUpdateProduct = async (
     productId: string,
-    updates: { name?: string; price?: number; stock?: number; discountPercent?: number | null }
+    updates: { name?: string; description?: string; price?: number; stock?: number; discountPercent?: number | null }
   ) => {
     if (!accessToken) {
       console.error('[Admin Products] No access token available')
@@ -130,6 +130,9 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
       const updateData: Record<string, unknown> = {}
       if (updates.name !== undefined) {
         updateData.name = updates.name.trim()
+      }
+      if (updates.description !== undefined) {
+        updateData.description = updates.description.trim()
       }
       if (updates.price !== undefined) {
         updateData.price = updates.price
@@ -406,6 +409,9 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
                 Product
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
+                Description
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
                 Category
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-neutral-500">
@@ -477,6 +483,56 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
                       </div>
                       <div className="text-xs text-neutral-500">{product.slug}</div>
                     </>
+                  )}
+                </td>
+                <td className="px-6 py-4 text-sm text-neutral-700 max-w-xs">
+                  {editing?.productId === product.id && editing.field === 'description' ? (
+                    <textarea
+                      defaultValue={product.description}
+                      onBlur={async (e) => {
+                        const inputValue = e.target.value.trim()
+                        if (inputValue === '') {
+                          setEditing(null)
+                          return
+                        }
+                        if (inputValue !== product.description) {
+                          await handleUpdateProduct(product.id, { description: inputValue })
+                        } else {
+                          setEditing(null)
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                          e.preventDefault()
+                          setEditing(null)
+                        }
+                        // Allow Ctrl+Enter or Cmd+Enter to save
+                        if ((e.key === 'Enter' && (e.ctrlKey || e.metaKey))) {
+                          e.preventDefault()
+                          e.currentTarget.blur()
+                        }
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.select()
+                      }}
+                      rows={3}
+                      className="w-full rounded border border-neutral-300 px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 resize-y"
+                      autoFocus
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setEditing({ productId: product.id, field: 'description' })
+                      }}
+                      className="hover:text-primary-600 transition-colors cursor-pointer text-left w-full"
+                    >
+                      <p className="line-clamp-2 text-neutral-600">
+                        {product.description || '—'}
+                      </p>
+                    </button>
                   )}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-neutral-500">
