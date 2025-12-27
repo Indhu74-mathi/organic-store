@@ -5,13 +5,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useCart } from '@/components/cart/CartContext'
 import { useAuth } from '@/components/auth/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { calculateDiscountedPrice } from '@/lib/pricing'
 
 export default function CartDrawer() {
   const { items, isOpen, close, setQuantity, removeItem, subtotal } = useCart()
   const { isAuthenticated, accessToken } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
   const [selectedCartItemIds, setSelectedCartItemIds] = useState<string[]>([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -22,6 +23,13 @@ export default function CartDrawer() {
   }, [])
 
   const hasItems = items.length > 0
+
+  // Reset checkout state when cart drawer opens or when not on checkout page
+  useEffect(() => {
+    if (isOpen || pathname !== '/checkout') {
+      setIsCheckingOut(false)
+    }
+  }, [isOpen, pathname])
 
   // Initialize all items as selected by default
   useEffect(() => {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const HERO_IMAGES = [
   {
@@ -75,14 +76,16 @@ export default function HeroImageCarousel() {
           const isActive = index === currentIndex
 
           return (
-            <div
+            <Link
               key={image.src}
-              className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+              href="/shop"
+              className="absolute inset-0 transition-opacity duration-1000 ease-in-out cursor-pointer"
               style={{
                 opacity: isActive ? 1 : 0,
                 zIndex: isActive ? 1 : 0,
               }}
               aria-hidden={!isActive}
+              aria-label="Browse our organic products"
             >
               <Image
                 src={image.src}
@@ -92,7 +95,7 @@ export default function HeroImageCarousel() {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
               />
-            </div>
+            </Link>
           )
         })}
       </div>
