@@ -101,12 +101,11 @@ export default function Header() {
       >
         <div className="flex items-center w-full">
           {/* Brand/Logo - Absolute left */}
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
             <Link
               href="/"
-              className="relative transition-opacity hover:opacity-80 focus:outline-none focus:outline-none overflow-hidden"
+              className="relative h-12 w-[200px] sm:h-14 sm:w-[300px] md:h-16 md:w-[400px] lg:w-[500px] transition-opacity hover:opacity-80 focus:outline-none overflow-hidden"
               aria-label="Millets N Joy home"
-              style={{ height: '64px', width: '600px' }}
             >
               <Image
                 src="/Logo.jpeg"
@@ -178,12 +177,11 @@ export default function Header() {
     >
       <div className="flex items-center w-full">
         {/* Brand/Logo - Absolute left */}
-        <div className="flex items-center">
+        <div className="flex items-center shrink-0">
           <Link
             href="/"
-            className="relative transition-opacity hover:opacity-80 focus:outline-none focus:outline-none overflow-hidden"
+            className="relative h-12 w-[200px] sm:h-14 sm:w-[300px] md:h-16 md:w-[400px] lg:w-[500px] transition-opacity hover:opacity-80 focus:outline-none overflow-hidden"
             aria-label="Millets N Joy home"
-            style={{ height: '64px', width: '600px' }}
           >
             <Image
               src="/Logo.jpeg"
@@ -196,7 +194,7 @@ export default function Header() {
         </div>
         
         <nav
-          className="flex-1 flex items-center justify-end gap-6 pr-6 py-5 sm:pr-8 lg:pr-10"
+          className="flex-1 flex items-center justify-end gap-2 pr-2 py-5 sm:gap-4 sm:pr-4 md:gap-6 md:pr-6 lg:pr-10"
           aria-label="Main navigation"
         >
 

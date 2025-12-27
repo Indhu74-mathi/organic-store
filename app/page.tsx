@@ -1,5 +1,6 @@
 import AnimatedPage from '@/components/AnimatedPage'
 import FeaturedProductsSection from '@/components/sections/FeaturedProductsSection'
+import FloatingMillets from '@/components/sections/FloatingMillets'
 import HeroImageCarousel from '@/components/sections/HeroImageCarousel'
 import HeroSection from '@/components/sections/HeroSection'
 import TrustSection from '@/components/sections/TrustSection'
@@ -10,7 +11,10 @@ import CustomerFeedbackSection from '@/components/sections/CustomerFeedbackSecti
 export default function Home() {
   return (
     <AnimatedPage>
-      <div className="space-y-0">
+      {/* Background animation - millets, nuts, and malt floating */}
+      <FloatingMillets />
+      
+      <div className="relative space-y-0" style={{ zIndex: 1 }}>
         <HeroImageCarousel />
         <HeroSection />
         <VideoPlaceholderSection />

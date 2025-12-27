@@ -219,8 +219,8 @@ export default function CartDrawer() {
                       </button>
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between gap-3">
-                      <div className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-2 py-1">
+                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-2 py-1 w-fit">
                         <button
                           type="button"
                           onClick={() =>
@@ -228,7 +228,7 @@ export default function CartDrawer() {
                           }
                           disabled={isUnavailable}
                           aria-label="Decrease quantity"
-                          className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-700 hover:bg-neutral-100 focus:outline-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-700 hover:bg-neutral-100 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           −
                         </button>
@@ -243,39 +243,39 @@ export default function CartDrawer() {
                           }}
                           disabled={isUnavailable || (availableStock > 0 && item.quantity >= availableStock)}
                           aria-label="Increase quantity"
-                          className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-700 hover:bg-neutral-100 focus:outline-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-700 hover:bg-neutral-100 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           +
                         </button>
                       </div>
 
-                      <div className="flex flex-col items-end gap-1">
+                      <div className="flex flex-col items-start gap-1 sm:items-end">
                         {item.product.discountPercent && item.product.discountPercent > 0 ? (
                           <>
-                            <div className="flex items-baseline gap-2">
-                            <span className="text-sm font-semibold text-neutral-900">
+                            <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+                            <span className="text-sm font-semibold text-neutral-900 whitespace-nowrap">
                               ₹{(
                                 (calculateDiscountedPrice(item.product.price * 100, item.product.discountPercent) / 100) *
                                 item.quantity
                               ).toFixed(2)}
                             </span>
-                            <span className="text-xs text-neutral-400 line-through">
+                            <span className="text-xs text-neutral-400 line-through whitespace-nowrap">
                               ₹{(item.product.price * item.quantity).toFixed(2)}
                               </span>
-                              <span className="rounded-full bg-primary-100 px-2 py-0.5 text-xs font-semibold text-primary-700">
+                              <span className="rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] sm:text-xs font-semibold text-primary-700 whitespace-nowrap">
                                 {item.product.discountPercent}% OFF
                               </span>
                             </div>
-                            <span className="text-xs text-neutral-500">
+                            <span className="text-xs text-neutral-500 whitespace-nowrap">
                               ₹{(calculateDiscountedPrice(item.product.price * 100, item.product.discountPercent) / 100).toFixed(2)} per unit
                             </span>
                           </>
                         ) : (
                           <>
-                          <span className="text-sm font-semibold text-neutral-900">
+                          <span className="text-sm font-semibold text-neutral-900 whitespace-nowrap">
                             ₹{(item.product.price * item.quantity).toFixed(2)}
                           </span>
-                            <span className="text-xs text-neutral-500">
+                            <span className="text-xs text-neutral-500 whitespace-nowrap">
                               ₹{item.product.price.toFixed(2)} per unit
                             </span>
                           </>
