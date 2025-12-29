@@ -127,7 +127,7 @@ export async function GET(_req: NextRequest) {
 
     return NextResponse.json({
       cartId,
-      items: validItems,
+      items: itemsWithProducts,
     })
   } catch (error) {
     console.error('[API Cart] Error:', error)
