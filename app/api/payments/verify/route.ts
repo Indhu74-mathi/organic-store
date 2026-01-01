@@ -3,6 +3,7 @@ import { createSupabaseServer } from '@/lib/supabase/server'
 import { createErrorResponse, unauthorizedResponse } from '@/lib/auth/api-auth'
 import { validateString } from '@/lib/auth/validate-input'
 import { verifyRazorpaySignature, getRazorpayPayment } from '@/lib/payments/razorpay'
+import { hasVariants } from '@/lib/products'
 
 export const runtime = 'nodejs'
 
@@ -155,11 +156,11 @@ export async function POST(_req: NextRequest) {
         return createErrorResponse(`Product ${orderItem.productName} is no longer available`, 400)
       }
 
-      const isMalt = product.category === 'Malt'
+      const usesVariants = hasVariants(product.category)
       
-      // For malt products with sizeGrams, check variant stock
+      // For variant-based products with sizeGrams, check variant stock
       const orderItemWithSize = orderItem as typeof orderItem & { sizeGrams?: number | null }
-      if (isMalt && orderItemWithSize.sizeGrams) {
+      if (usesVariants && orderItemWithSize.sizeGrams) {
         const { data: variant } = await supabase
           .from('ProductVariant')
           .select('stock')
@@ -242,7 +243,7 @@ export async function POST(_req: NextRequest) {
 
     // Step 7: Reduce stock for each item (safely)
     for (const orderItem of orderData.orderItemsData) {
-      // Check if this is a malt product with variant
+      // Check if this is a variant-based product
       const { data: product } = await supabase
         .from('Product')
         .select('category, stock')
@@ -254,10 +255,10 @@ export async function POST(_req: NextRequest) {
         continue
       }
 
-      const isMalt = product.category === 'Malt'
+      const usesVariants = hasVariants(product.category)
       
-      if (isMalt && orderItem.sizeGrams) {
-        // Reduce stock from ProductVariant for malt products
+      if (usesVariants && orderItem.sizeGrams) {
+        // Reduce stock from ProductVariant for variant-based products
         const { data: variant, error: fetchVariantError } = await supabase
           .from('ProductVariant')
           .select('stock')
@@ -294,7 +295,7 @@ export async function POST(_req: NextRequest) {
           console.error('[API Payments Verify] Failed to update variant stock:', updateStockError)
         }
       } else {
-        // Reduce stock from Product for non-malt products
+        // Reduce stock from Product for non-variant products
         const { error: stockError } = await supabase.rpc('decrement_stock', {
           product_id: orderItem.productId,
           quantity: orderItem.quantity,

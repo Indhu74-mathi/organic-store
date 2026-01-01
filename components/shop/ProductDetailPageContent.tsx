@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import Image from 'next/image'
 import { calculateDiscountedPrice } from '@/lib/pricing'
+import { hasVariants } from '@/lib/products'
 
 interface ProductDetailPageContentProps {
   product: Product
@@ -27,11 +28,11 @@ export default function ProductDetailPageContent({
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null)
   const { addItem } = useCart()
 
-  const isMalt = product.category === 'Malt'
+  const usesVariants = hasVariants(product.category)
   const variants = product.variants || []
   
-  // For malt products, use selected variant stock; otherwise use product stock
-  const selectedVariant = isMalt && selectedVariantId 
+  // For variant-based products (Malt, saadha podi), use selected variant stock; otherwise use product stock
+  const selectedVariant = usesVariants && selectedVariantId 
     ? variants.find(v => v.id === selectedVariantId)
     : null
   
@@ -45,7 +46,7 @@ export default function ProductDetailPageContent({
 
   const isLowStock = availableStock > 0 && availableStock < 20
   const maxQuantity = availableStock > 0 ? Math.min(availableStock, 99) : 0
-  const canAddToCart = !isMalt || (isMalt && selectedVariantId && availableStock > 0)
+  const canAddToCart = !usesVariants || (usesVariants && selectedVariantId && availableStock > 0)
 
   const increment = () => {
     if (quantity < maxQuantity) {
@@ -107,8 +108,8 @@ export default function ProductDetailPageContent({
               </p>
             </div>
 
-            {/* Size selector for malt products */}
-            {isMalt && variants.length > 0 && (
+            {/* Size selector for variant-based products (Malt, saadha podi) */}
+            {usesVariants && variants.length > 0 && (
               <div className="space-y-3">
                 <label className="block text-sm font-semibold text-neutral-900">
                   Select Size <span className="text-red-500">*</span>
@@ -239,14 +240,14 @@ export default function ProductDetailPageContent({
                 <button
                   type="button"
                   onClick={async () => {
-                    if (isMalt && !selectedVariantId) {
+                    if (usesVariants && !selectedVariantId) {
                       setStockError('Please select a size')
                       return
                     }
                     if (availableStock > 0 && quantity <= availableStock) {
                       setStockError(null)
                       // Create product with variant info for addItem
-                      const productToAdd = isMalt && selectedVariant
+                      const productToAdd = usesVariants && selectedVariant
                         ? { ...product, price: selectedVariant.price, stock: selectedVariant.stock, sizeGrams: selectedVariant.sizeGrams }
                         : product
                       await addItem(productToAdd, quantity, selectedVariantId || undefined)
@@ -254,14 +255,14 @@ export default function ProductDetailPageContent({
                       setStockError(`Only ${availableStock} available in stock`)
                     }
                   }}
-                  disabled={quantity > availableStock || availableStock === 0 || (isMalt && !selectedVariantId)}
+                  disabled={quantity > availableStock || availableStock === 0 || (usesVariants && !selectedVariantId)}
                   className="inline-flex flex-1 items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-primary-800 active:scale-95 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed sm:flex-none"
                 >
-                  {isMalt && !selectedVariantId ? 'Select Size' : 'Add to Cart'}
+                  {usesVariants && !selectedVariantId ? 'Select Size' : 'Add to Cart'}
                 </button>
               ) : (
                 <div className="inline-flex flex-1 items-center justify-center rounded-full bg-neutral-100 px-6 py-3 text-sm font-semibold text-neutral-500 sm:flex-none">
-                  {isMalt && !selectedVariantId ? 'Select Size to Add to Cart' : 'Currently unavailable'}
+                  {usesVariants && !selectedVariantId ? 'Select Size to Add to Cart' : 'Currently unavailable'}
                 </div>
               )}
             </div>

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { requireAdmin, createErrorResponse, forbiddenResponse } from '@/lib/auth/api-auth'
-import { products as staticProducts } from '@/lib/products'
+// Note: Static product import is not currently supported
+// Products should be added through the admin UI or imported via database migration
+const staticProducts: any[] = []
 
 /**
  * POST /api/admin/products/import-static

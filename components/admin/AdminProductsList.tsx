@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { calculateDiscountedPrice } from '@/lib/pricing'
+import { hasVariants } from '@/lib/products'
 
 interface ProductVariant {
   id: string
@@ -38,7 +39,7 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
   const [showAddForm, setShowAddForm] = useState(false)
   const [isActivating, setIsActivating] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
-  const [editing, setEditing] = useState<{ productId: string; field: 'name' | 'description' | 'price' | 'stock' | 'discount' } | null>(null)
+  const [editing, setEditing] = useState<{ productId: string; field: 'name' | 'description' | 'price' | 'stock' | 'discount' | 'category' } | null>(null)
   const [editingVariant, setEditingVariant] = useState<{ productId: string; variantId: string; field: 'price' | 'stock' } | null>(null)
 
   useEffect(() => {
@@ -183,7 +184,7 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
 
   const handleUpdateProduct = async (
     productId: string,
-    updates: { name?: string; description?: string; price?: number; stock?: number; discountPercent?: number | null }
+    updates: { name?: string; description?: string; price?: number; stock?: number; discountPercent?: number | null; category?: string }
   ) => {
     if (!accessToken) {
       console.error('[Admin Products] No access token available')
@@ -207,6 +208,9 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
       }
       if (updates.discountPercent !== undefined) {
         updateData.discountPercent = updates.discountPercent
+      }
+      if (updates.category !== undefined) {
+        updateData.category = updates.category.trim()
       }
 
       // Don't make API call if no updates
@@ -600,11 +604,54 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
                     </button>
                   )}
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-neutral-500">
-                  {product.category}
+                <td className="whitespace-nowrap px-6 py-4 text-sm">
+                  {editing?.productId === product.id && editing.field === 'category' ? (
+                    <input
+                      type="text"
+                      defaultValue={product.category}
+                      onBlur={async (e) => {
+                        const inputValue = e.target.value.trim()
+                        if (inputValue === '') {
+                          setEditing(null)
+                          return
+                        }
+                        if (inputValue !== product.category) {
+                          await handleUpdateProduct(product.id, { category: inputValue })
+                        } else {
+                          setEditing(null)
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          e.currentTarget.blur()
+                        } else if (e.key === 'Escape') {
+                          e.preventDefault()
+                          setEditing(null)
+                        }
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.select()
+                      }}
+                      className="w-full rounded border border-neutral-300 px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                      autoFocus
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setEditing({ productId: product.id, field: 'category' })
+                      }}
+                      className="hover:text-primary-600 transition-colors cursor-pointer text-left text-neutral-500"
+                    >
+                      {product.category}
+                    </button>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  {product.category === 'Malt' && product.variants && product.variants.length > 0 ? (
+                  {hasVariants(product.category) && product.variants && product.variants.length > 0 ? (
                     <div className="space-y-2">
                       {product.variants.map((variant) => (
                         <div key={variant.id} className="flex items-center gap-2 text-xs">
@@ -743,7 +790,7 @@ export default function AdminProductsList({ accessToken }: AdminProductsListProp
                   )}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-neutral-900">
-                  {product.category === 'Malt' && product.variants && product.variants.length > 0 ? (
+                  {hasVariants(product.category) && product.variants && product.variants.length > 0 ? (
                     <div className="space-y-2">
                       {product.variants.map((variant) => (
                         <div key={variant.id} className="flex items-center gap-2 text-xs">

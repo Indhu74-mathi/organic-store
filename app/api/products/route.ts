@@ -64,17 +64,24 @@ export async function GET(_req: NextRequest) {
       return NextResponse.json({ products: [] })
     }
 
+    // Helper function for variant categories (Edge runtime compatible, case-insensitive)
+    const hasVariants = (category: string) => {
+      if (!category) return false
+      const normalized = category.trim().toLowerCase()
+      return normalized === 'malt' || normalized === 'saadha podi'
+    }
+
     // Map products to API response format
     const mappedProducts = products.map((p: any) => {
-      const isMalt = p.category === 'Malt'
+      const usesVariants = hasVariants(p.category)
       const variants = p.ProductVariant || []
       
-      // For malt products: check if any variant has stock
-      // For non-malt: use product stock
+      // For variant-based products: check if any variant has stock
+      // For non-variant products: use product stock
       let inStock: boolean
       let stock: number
       
-      if (isMalt) {
+      if (usesVariants) {
         const hasStock = variants.some((v: any) => v.stock > 0)
         const totalStock = variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
         inStock = p.isActive && hasStock
@@ -94,7 +101,7 @@ export async function GET(_req: NextRequest) {
         name: p.name,
         slug: p.slug,
         description: p.description,
-        price: p.price / 100, // Convert paise to rupees - base price for non-malt
+        price: p.price / 100, // Convert paise to rupees - base price for non-variant products
         discountPercent: p.discountPercent,
         imageUrl: p.imageUrl,
         category: p.category,
@@ -102,8 +109,8 @@ export async function GET(_req: NextRequest) {
         inStock: inStock,
         isActive: p.isActive,
         image: p.imageUrl,
-        // Include variants for malt products
-        ...(isMalt && {
+        // Include variants for variant-based products
+        ...(usesVariants && {
           variants: variants.map((v: any) => ({
             id: v.id,
             sizeGrams: v.sizeGrams,

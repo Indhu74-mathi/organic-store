@@ -11,11 +11,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Millets N Joy | Premium Organic Food & Products',
+    default: 'Millets N Joy | Traditional Millet Products',
     template: '%s | Millets N Joy',
   },
   description:
-    'Discover premium organic food, fresh produce, and natural products.',
+    'Discover premium malt, saadha podi, and traditional foods made with quality ingredients and authentic preparation.',
 }
 
 export default function RootLayout({
@@ -25,19 +25,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="min-h-screen pb-20 sm:pb-24">
+      <body className="min-h-screen">
         {/* 
           Server layout ALWAYS renders children.
           Providers handles client-only logic safely.
           Ambient gradient overlay is applied via CSS ::before on body.
         */}
         <Providers>
-          <div className="flex min-h-screen flex-col relative z-10">
-            <main className="flex-1 relative z-10">
-              <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-                {children}
-              </div>
-            </main>
+          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            {children}
           </div>
         </Providers>
       </body>

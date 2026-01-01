@@ -12,7 +12,7 @@ export default function VideoPlaceholderSection() {
             </p>
             <p className="mx-auto max-w-2xl text-sm text-neutral-600 sm:text-base">
               This space will soon feature a calm, autoplaying muted video
-              that quietly showcases our farms, ingredients, and sourcing
+              that quietly showcases our products, ingredients, and preparation
               process—designed to build trust without distracting from your
               shopping experience.
             </p>

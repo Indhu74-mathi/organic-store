@@ -3,6 +3,7 @@ import { createSupabaseServer } from '@/lib/supabase/server'
 import { createErrorResponse, unauthorizedResponse } from '@/lib/auth/api-auth'
 import { validateArray, validateString, validateCartItemId } from '@/lib/auth/validate-input'
 import { calculateDiscountedPrice } from '@/lib/pricing'
+import { hasVariants } from '@/lib/products'
 
 export const runtime = 'nodejs'
 
@@ -195,13 +196,13 @@ export async function POST(req: NextRequest) {
         return createErrorResponse(`Product ${product.name} is no longer available`, 400)
       }
 
-      const isMalt = product.category === 'Malt'
+      const usesVariants = hasVariants(product.category)
       let variant: any = null
       let unitPriceInPaise: number
       let availableStock: number
       let sizeGrams: number | null = null
 
-      if (isMalt && cartItem.variantId) {
+      if (usesVariants && cartItem.variantId) {
         variant = variants.find((v) => v.id === cartItem.variantId)
         if (!variant) {
           return createErrorResponse(`Variant not found for ${product.name}`, 404)
@@ -264,10 +265,10 @@ export async function POST(req: NextRequest) {
         return createErrorResponse(`Product ${orderItem.productName} is no longer available`, 400)
       }
 
-      const isMalt = product.category === 'Malt'
+      const usesVariants = hasVariants(product.category)
       
-      // For malt products with sizeGrams, check variant stock
-      if (isMalt && orderItem.sizeGrams) {
+      // For variant-based products with sizeGrams, check variant stock
+      if (usesVariants && orderItem.sizeGrams) {
         const { data: variant } = await supabase
           .from('ProductVariant')
           .select('stock')
@@ -361,10 +362,10 @@ export async function POST(req: NextRequest) {
         continue
       }
 
-      const isMalt = product.category === 'Malt'
+      const usesVariants = hasVariants(product.category)
       
-      if (isMalt && orderItem.sizeGrams) {
-        // Reduce stock from ProductVariant for malt products
+      if (usesVariants && orderItem.sizeGrams) {
+        // Reduce stock from ProductVariant for variant-based products
         const { data: variant, error: fetchVariantError } = await supabase
           .from('ProductVariant')
           .select('stock')

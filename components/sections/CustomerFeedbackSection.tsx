@@ -3,19 +3,19 @@
 const feedbacks = [
   {
     rating: 5,
-    text: 'Switching to these organic products has been a game-changer for our family. The quality is exceptional, and I feel confident knowing exactly what we\'re eating. The millets are so fresh and the malt products are perfect for our morning routine.',
+    text: 'Switching to these products has been a game-changer for our family. The quality is exceptional, and I feel confident knowing exactly what we\'re eating. The malt products are perfect for our morning routine.',
     customerName: 'Priya Sharma',
     subtitle: 'Verified Buyer',
   },
   {
     rating: 5,
-    text: 'As a health-conscious parent, finding trustworthy organic products was challenging. This store has become our go-to. The products are authentic, well-packaged, and the customer service is outstanding. Highly recommend!',
+    text: 'As a health-conscious parent, finding trustworthy malt products was challenging. This store has become our go-to. The products are authentic, well-packaged, and the customer service is outstanding. Highly recommend!',
     customerName: 'Rajesh Kumar',
     subtitle: 'Verified Buyer',
   },
   {
     rating: 5,
-    text: 'The quality and purity of these organic products is unmatched. We\'ve been using them for months now, and the difference in taste and nutrition is remarkable. Worth every rupee for our family\'s health. Loved the quality of the products.',
+    text: 'The quality and taste of these malt products is unmatched. We\'ve been using them for months now, and the difference in taste and nutrition is remarkable. Worth every rupee for our family\'s health. Loved the quality of the products.',
     customerName: 'Anjali Patel',
     subtitle: 'Verified Buyer',
   },
@@ -30,7 +30,7 @@ export default function CustomerFeedbackSection() {
             Loved by families who care about what they eat
           </h2>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-neutral-600">
-            Real feedback from customers who chose healthier, organic alternatives.
+            Real feedback from customers who chose healthier, traditional malt and food products.
           </p>
         </div>
 

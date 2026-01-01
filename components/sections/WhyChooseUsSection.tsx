@@ -9,7 +9,7 @@ export default function WhyChooseUsSection() {
             Why Choose Us
           </h2>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-neutral-600">
-            We&apos;re committed to bringing you the best organic products with
+            We&apos;re committed to bringing you the best malt and millet products with
             transparency and care.
           </p>
         </div>

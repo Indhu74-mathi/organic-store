@@ -4,6 +4,7 @@ import { createErrorResponse, unauthorizedResponse } from '@/lib/auth/api-auth'
 import { validateArray, validateString, validateCartItemId } from '@/lib/auth/validate-input'
 import { createRazorpayOrder } from '@/lib/payments/razorpay'
 import { calculateDiscountedPrice } from '@/lib/pricing'
+import { hasVariants } from '@/lib/products'
 
 export const runtime = 'nodejs'
 
@@ -193,13 +194,13 @@ export async function POST(req: NextRequest) {
         return createErrorResponse(`Product ${product.name} is no longer available`, 400)
       }
 
-      const isMalt = product.category === 'Malt'
+      const usesVariants = hasVariants(product.category)
       let variant: any = null
       let unitPriceInPaise: number
       let availableStock: number
       let sizeGrams: number | null = null
 
-      if (isMalt && cartItem.variantId) {
+      if (usesVariants && cartItem.variantId) {
         variant = variants.find((v) => v.id === cartItem.variantId)
         if (!variant) {
           return createErrorResponse(`Variant not found for ${product.name}`, 404)

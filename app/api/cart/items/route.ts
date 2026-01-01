@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { createSupabaseServer } from '@/lib/supabase/server'
 import { createErrorResponse } from '@/lib/auth/api-auth'
 import { validateString, validateNumber } from '@/lib/auth/validate-input'
+import { hasVariants } from '@/lib/products'
 
 export const runtime = "nodejs"
 
@@ -65,12 +66,12 @@ export async function POST(_req: NextRequest) {
       return createErrorResponse('Product not found or unavailable', 400)
     }
 
-    const isMalt = products.category === 'Malt'
+    const usesVariants = hasVariants(products.category)
     let variant: any = null
     let variantId: string | null = null
 
-    // For malt products, variantId is required
-    if (isMalt) {
+    // For variant-based products, variantId is required
+    if (usesVariants) {
       variantId = validateString(rawVariantId, {
         minLength: 1,
         maxLength: 100,
@@ -132,7 +133,7 @@ export async function POST(_req: NextRequest) {
     let unitPrice: number
     let sizeGrams: number | null = null
 
-    if (isMalt) {
+    if (usesVariants) {
       // Use variant stock and price
       availableStock = variant.stock
       unitPrice = variant.price / 100
@@ -143,14 +144,14 @@ export async function POST(_req: NextRequest) {
       unitPrice = products.price / 100
     }
 
-    // Check if item already exists in cart (for malt, also check variantId)
+    // Check if item already exists in cart (for variant-based products, also check variantId)
     let existingItemsQuery = supabase
       .from('CartItem')
       .select('id, quantity')
       .eq('cartId', cartId)
       .eq('productId', productId)
 
-    if (isMalt && variantId) {
+    if (usesVariants && variantId) {
       existingItemsQuery = existingItemsQuery.eq('variantId', variantId)
     }
 
@@ -197,7 +198,7 @@ export async function POST(_req: NextRequest) {
           imageUrl: products.imageUrl,
           category: products.category,
           stock: availableStock,
-          ...(isMalt && { sizeGrams }),
+          ...(usesVariants && { sizeGrams }),
         },
         quantity: updatedItem.quantity,
       })
@@ -217,7 +218,7 @@ export async function POST(_req: NextRequest) {
         quantity: finalQuantity,
       }
 
-      if (isMalt && variantId) {
+      if (usesVariants && variantId) {
         insertData.variantId = variantId
       }
 
@@ -240,7 +241,7 @@ export async function POST(_req: NextRequest) {
           imageUrl: products.imageUrl,
           category: products.category,
           stock: availableStock,
-          ...(isMalt && { sizeGrams }),
+          ...(usesVariants && { sizeGrams }),
         },
         quantity: finalQuantity,
       })

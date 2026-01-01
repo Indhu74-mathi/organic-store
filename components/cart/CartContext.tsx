@@ -14,11 +14,10 @@ import type { Product } from '@/types'
 import CartDrawer from '@/components/cart/CartDrawer'
 import {
   getOrCreateCartId,
-  loadCartSnapshot,
   saveCartSnapshot,
   serializeCartItems,
 } from '@/lib/cartStorage'
-import { products } from '@/lib/products'
+import { hasVariants } from '@/lib/products'
 import { useAuth } from '@/components/auth/AuthContext'
 import { calculateDiscountedPrice } from '@/lib/pricing'
 
@@ -60,13 +59,13 @@ const CartContext = createContext<CartContextValue | undefined>(undefined)
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
-      // For malt products with variants, check both product.id and sizeGrams
+      // For variant-based products with variants, check both product.id and sizeGrams
       // Same product with different sizes = separate cart items
-      const isMalt = action.product.category === 'Malt'
+      const usesVariants = hasVariants(action.product.category)
       const existing = state.items.find((item) => {
         if (item.product.id !== action.product.id) return false
-        if (isMalt) {
-          // For malt products, match by sizeGrams
+        if (usesVariants) {
+          // For variant-based products, match by sizeGrams
           return item.product.sizeGrams === action.product.sizeGrams
         }
         return true
@@ -76,7 +75,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         return {
           items: state.items.map((item) => {
             if (item.product.id !== action.product.id) return item
-            if (isMalt && item.product.sizeGrams !== action.product.sizeGrams) return item
+            if (usesVariants && item.product.sizeGrams !== action.product.sizeGrams) return item
             return { ...item, quantity: item.quantity + action.quantity }
           }),
         }
@@ -91,11 +90,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       if (action.cartItemId) {
         return { items: state.items.filter((item) => item.cartItemId !== action.cartItemId) }
       }
-      // Guest cart: match by productId + sizeGrams for Malt products
+      // Guest cart: match by productId + sizeGrams for variant-based products
       const itemToRemove = state.items.find((item) => item.product.id === action.productId)
       if (itemToRemove) {
-        const isMalt = itemToRemove.product.category === 'Malt'
-        if (isMalt && action.sizeGrams !== undefined) {
+        const usesVariants = hasVariants(itemToRemove.product.category)
+        if (usesVariants && action.sizeGrams !== undefined) {
           return {
             items: state.items.filter(
               (item) =>
@@ -119,11 +118,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
             .filter((item) => item.quantity > 0),
         }
       }
-      // Guest cart: match by productId + sizeGrams for Malt products
+      // Guest cart: match by productId + sizeGrams for variant-based products
       const itemToUpdate = state.items.find((item) => item.product.id === action.productId)
       if (itemToUpdate) {
-        const isMalt = itemToUpdate.product.category === 'Malt'
-        if (isMalt && action.sizeGrams !== undefined) {
+        const usesVariants = hasVariants(itemToUpdate.product.category)
+        if (usesVariants && action.sizeGrams !== undefined) {
           return {
             items: state.items
               .map((item) =>
@@ -247,24 +246,9 @@ export function CartProvider({ children }: CartProviderProps) {
       const id = getOrCreateCartId()
       setCartId(id || null)
 
-      const snapshot = loadCartSnapshot()
-      if (snapshot && snapshot.items.length > 0) {
-        const hydratedItems: CartItem[] = snapshot.items
-          .map(({ productId, quantity }) => {
-            const product = products.find((p) => p.id === productId)
-            if (!product || quantity <= 0) return null
-            return { product, quantity }
-          })
-          .filter((item): item is CartItem => item !== null)
-
-        if (hydratedItems.length > 0) {
-          dispatch({ type: 'REPLACE_ALL', items: hydratedItems })
-        } else {
-          dispatch({ type: 'REPLACE_ALL', items: [] })
-        }
-      } else {
-        dispatch({ type: 'REPLACE_ALL', items: [] })
-      }
+      // For authenticated users, cart is loaded from API in loadCart()
+      // Guest cart hydration from localStorage is handled separately and doesn't use static products
+      dispatch({ type: 'REPLACE_ALL', items: [] })
     }
   }, [hasMounted, isAuthenticated, accessToken])
 
@@ -510,11 +494,11 @@ export function CartProvider({ children }: CartProviderProps) {
             dispatch({ type: 'REMOVE_ITEM', productId, sizeGrams })
           }
         } else {
-          // Guest user - remove from in-memory state (match by productId + sizeGrams for Malt)
+          // Guest user - remove from in-memory state (match by productId + sizeGrams for variant-based products)
           // Calculate updated items (state.items will update after dispatch)
           const itemToRemove = state.items.find((item) => item.product.id === productId)
-          const isMalt = itemToRemove?.product.category === 'Malt'
-          const updatedItems = isMalt && sizeGrams !== undefined
+          const usesVariants = itemToRemove?.product.category ? hasVariants(itemToRemove.product.category) : false
+          const updatedItems = usesVariants && sizeGrams !== undefined
             ? state.items.filter(
                 (item) =>
                   !(item.product.id === productId && item.product.sizeGrams === sizeGrams)
@@ -578,8 +562,8 @@ export function CartProvider({ children }: CartProviderProps) {
           ? state.items.find((item) => item.cartItemId === cartItemId)
           : state.items.find((item) => {
               if (item.product.id !== productId) return false
-              const isMalt = item.product.category === 'Malt'
-              if (isMalt && sizeGrams !== undefined) {
+              const usesVariants = hasVariants(item.product.category)
+              if (usesVariants && sizeGrams !== undefined) {
                 return item.product.sizeGrams === sizeGrams
               }
               return true

@@ -48,10 +48,11 @@ export async function POST(
 
     const order = orders[0]
 
-    // Only allow cancellation of pending/failed orders
-    if (order.status !== 'PAYMENT_PENDING' && order.status !== 'PAYMENT_FAILED') {
+    // Only allow cancellation of pending/failed/confirmed orders (not shipped or later)
+    const cancellableStatuses = ['PAYMENT_PENDING', 'PAYMENT_FAILED', 'ORDER_CONFIRMED']
+    if (!cancellableStatuses.includes(order.status)) {
       return createErrorResponse(
-        `Order cannot be cancelled. Current status: ${order.status}`,
+        `Order cannot be cancelled. Cancellation is only available before shipping. Current status: ${order.status}`,
         400
       )
     }

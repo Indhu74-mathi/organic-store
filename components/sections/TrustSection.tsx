@@ -9,24 +9,23 @@ export default function TrustSection() {
             </h2>
             <div className="space-y-5 text-left text-base leading-relaxed text-neutral-700 sm:text-lg">
               <p>
-                At Organic Store, we believe that what you put into your body
+                At Millets N Joy, we believe that what you put into your body
                 matters. That&apos;s why we&apos;ve built our entire business around
-                sourcing the highest quality organic products from trusted
-                farmers and producers.
+                crafting the highest quality malt and millet products using authentic methods
+                and quality ingredients.
               </p>
               <p>
-                Every product in our store is carefully selected, tested, and
-                certified to meet strict organic standards. We work directly with
-                local farmers to ensure freshness and support sustainable
-                agriculture practices that benefit both you and the environment.
+                Every product in our store is carefully prepared, tested, and
+                made to meet our strict quality standards. We use traditional preparation
+                methods to ensure you get the best taste and nutritional value from
+                our premium malt, saadha podi, and other traditional millet products.
               </p>
               <p>
-                Our commitment to quality doesn&apos;t stop at certification. We
-                personally visit our partner farms, verify their practices, and
-                maintain long-term relationships built on trust and mutual
-                respect. When you shop with us, you&apos;re not just buying food –
-                you&apos;re supporting a movement toward healthier living and a more
-                sustainable future.
+                Our commitment to quality runs deep. We carefully select ingredients,
+                follow traditional preparation methods, and maintain strict quality
+                control throughout the process. When you shop with us, you&apos;re not
+                just buying food – you&apos;re choosing nutritious malt and millet
+                products made with care and authenticity.
               </p>
             </div>
           </div>

@@ -623,6 +623,25 @@ export default function OrderDetailContent({ orderId }: OrderDetailContentProps)
                   </div>
                 </div>
               )}
+
+              {/* Cancel Button for Confirmed Orders (before shipping) */}
+              {order.status === 'ORDER_CONFIRMED' && (
+                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                  <h2 className="mb-4 text-lg font-semibold text-neutral-900">Order Actions</h2>
+                  <div className="space-y-3">
+                    <p className="text-sm text-neutral-600">
+                      Order cancellation is only available before shipping.
+                    </p>
+                    <button
+                      onClick={handleCancelOrder}
+                      disabled={isCancelling}
+                      className="w-full rounded-xl border border-red-300 bg-white px-6 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50 focus:outline-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isCancelling ? 'Cancelling...' : 'Cancel Order'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

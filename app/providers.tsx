@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 import FloatingShopButton from '@/components/FloatingShopButton'
 import FloatingWhatsAppButton from '@/components/FloatingWhatsAppButton'
 import { CartProvider } from '@/components/cart/CartContext'
@@ -30,9 +31,12 @@ export default function Providers({ children }: ProvidersProps) {
     <AuthProvider>
       <CartProvider>
         {/* Global UI (never remounts) */}
-        <div className="min-h-screen" style={{ border: 'none', boxShadow: 'none' }}>
+        <div className="flex min-h-screen flex-col relative z-10" style={{ border: 'none', boxShadow: 'none' }}>
           <Header />
-          <main className="flex-1" style={{ border: 'none', boxShadow: 'none' }}>{children}</main>
+          <main className="flex-1 relative z-10" style={{ border: 'none', boxShadow: 'none' }}>
+            {children}
+          </main>
+          <Footer />
           <FloatingWhatsAppButton />
           <FloatingShopButton />
         </div>

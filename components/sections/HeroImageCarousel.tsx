@@ -7,23 +7,23 @@ import Link from 'next/link'
 const HERO_IMAGES = [
   {
     src: '/image0.png',
-    alt: 'Organic products showcase - Farm fresh millets and grains',
+    alt: 'Millet products showcase - Traditional millets and grains',
   },
   {
     src: '/image1.png',
-    alt: 'Organic products showcase - Premium quality organic foods',
+    alt: 'Millet products showcase - Premium quality millet foods',
   },
   {
     src: '/image2.png',
-    alt: 'Organic products showcase - Natural and healthy options',
+    alt: 'Millet products showcase - Nutritious and healthy options',
   },
   {
     src: '/image3.png',
-    alt: 'Organic products showcase - Certified organic collection',
+    alt: 'Millet products showcase - Authentic millet collection',
   },
   {
     src: '/image4.png',
-    alt: 'Organic products showcase - Trusted organic brands',
+    alt: 'Millet products showcase - Trusted millet products',
   },
 ]
 
@@ -79,25 +79,50 @@ export default function HeroImageCarousel() {
             <Link
               key={image.src}
               href="/shop"
-              className="absolute inset-0 transition-opacity duration-1000 ease-in-out cursor-pointer"
+              className="absolute inset-0 transition-all duration-[2000ms] ease-in-out cursor-pointer"
               style={{
                 opacity: isActive ? 1 : 0,
                 zIndex: isActive ? 1 : 0,
+                filter: isActive ? 'blur(0px)' : 'blur(3px)',
+                transform: isActive ? 'scale(1)' : 'scale(1.03)',
               }}
               aria-hidden={!isActive}
-              aria-label="Browse our organic products"
+              aria-label="Browse our malt and traditional products"
             >
-              <Image
-                src={image.src}
-                alt={isActive ? image.alt : ''}
-                fill
-                priority={index === 0}
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+              <div 
+                className="absolute inset-0"
+                style={{
+                  filter: 'brightness(0.96) contrast(1.03) saturate(1.05)',
+                }}
+              >
+                <Image
+                  src={image.src}
+                  alt={isActive ? image.alt : ''}
+                  fill
+                  priority={index === 0}
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+                />
+              </div>
+              {/* Subtle gradient overlay for natural blending */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, transparent 12%, transparent 88%, rgba(0,0,0,0.08) 100%)',
+                }}
               />
             </Link>
           )
         })}
+        {/* Edge fade gradients for natural blending into background */}
+        <div 
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.15) 100%)',
+            maskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+          }}
+        />
       </div>
     </section>
   )

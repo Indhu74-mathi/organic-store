@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { createErrorResponse, forbiddenResponse, requireAdmin } from '@/lib/auth/api-auth'
 import { validateString, validateNumber } from '@/lib/auth/validate-input'
+import { hasVariants } from '@/lib/products'
 
 /**
  * PATCH /api/admin/products/[id]
@@ -79,11 +80,11 @@ export async function PATCH(
         .eq('id', productId)
         .single()
 
-      if (existingProduct?.category === 'Malt') {
-        // For Malt products, Product.price should NOT be editable
+      if (existingProduct && hasVariants(existingProduct.category)) {
+        // For variant-based products (Malt, saadha podi), Product.price should NOT be editable
         // Variant prices must be updated via ProductVariant table
         return createErrorResponse(
-          'Price updates for Malt products must be done via variant prices. Product.price is not editable for Malt products.',
+          'Price updates for variant-based products must be done via variant prices. Product.price is not editable for these products.',
           400
         )
       }
@@ -124,11 +125,11 @@ export async function PATCH(
         .eq('id', productId)
         .single()
 
-      if (existingProduct?.category === 'Malt') {
-        // For Malt products, Product.stock should NOT be editable
+      if (existingProduct && hasVariants(existingProduct.category)) {
+        // For variant-based products (Malt, saadha podi), Product.stock should NOT be editable
         // Variant stock must be updated via ProductVariant table
         return createErrorResponse(
-          'Stock updates for Malt products must be done via variant stock. Product.stock is not editable for Malt products.',
+          'Stock updates for variant-based products must be done via variant stock. Product.stock is not editable for these products.',
           400
         )
       }

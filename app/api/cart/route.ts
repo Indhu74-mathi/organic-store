@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { createSupabaseServer } from '@/lib/supabase/server'
 import { createErrorResponse } from '@/lib/auth/api-auth'
+import { hasVariants } from '@/lib/products'
 
 export const runtime = "nodejs"
 
@@ -81,7 +82,7 @@ export async function GET(_req: NextRequest) {
       return createErrorResponse('Failed to fetch products', 500)
     }
 
-    // Fetch variants for malt products
+    // Fetch variants for variant-based products (Malt, saadha podi)
     const variantIds = cartItems
       .map((item) => item.variantId)
       .filter((id: string | null): id is string => id !== null && id !== undefined)
@@ -107,13 +108,13 @@ export async function GET(_req: NextRequest) {
         const product = products.find((p) => p.id === item.productId)
         if (!product) return null
 
-        const isMalt = product.category === 'Malt'
+        const usesVariants = hasVariants(product.category)
         let price = product.price / 100
         let stock = product.stock
         let sizeGrams: number | null = null
 
-        // If malt product with variant, use variant data
-        if (isMalt && item.variantId) {
+        // If variant-based product with variant, use variant data
+        if (usesVariants && item.variantId) {
           const variant = variants.find((v) => v.id === item.variantId)
           if (variant) {
             price = variant.price / 100
@@ -135,7 +136,7 @@ export async function GET(_req: NextRequest) {
             image: product.imageUrl,
             inStock: product.isActive && stock > 0,
             stock: stock,
-            ...(isMalt && sizeGrams && { sizeGrams }),
+            ...(usesVariants && sizeGrams && { sizeGrams }),
           },
           quantity: item.quantity,
         }

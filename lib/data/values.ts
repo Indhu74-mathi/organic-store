@@ -5,22 +5,22 @@ import { ValueCard } from '@/types'
  */
 export const valueCards: ValueCard[] = [
   {
-    title: '100% Organic Certified',
+    title: 'Authentic Preparation',
     description:
-      'All our products are certified organic, ensuring you get the purest, most natural food without harmful chemicals or pesticides.',
-    icon: '🌿',
+      'Our premium malt and traditional foods are prepared using traditional methods, ensuring authentic taste and nutritional value.',
+    icon: '🌾',
   },
   {
-    title: 'Locally Sourced',
+    title: 'Quality Ingredients',
     description:
-      'We partner with local farmers and producers to bring you the freshest products while supporting our community and reducing carbon footprint.',
-    icon: '🏡',
+      'We use carefully selected quality ingredients in all our products. Every item is crafted with attention to detail and traditional preparation methods.',
+    icon: '✨',
   },
   {
     title: 'Quality Guaranteed',
     description:
       'Every product is carefully selected and quality-tested. We stand behind everything we sell with our satisfaction guarantee.',
-    icon: '✨',
+    icon: '🎯',
   },
 ]
 

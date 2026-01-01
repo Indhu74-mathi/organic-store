@@ -288,18 +288,18 @@ export default function FeaturedProductsSection() {
             Our Products
           </h2>
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-neutral-600">
-            A carefully curated selection of everyday essentials made from the
-            purest organic ingredients.
+            A carefully curated selection of premium malt, saadha podi, and other traditional millet products 
+            made with quality ingredients and authentic preparation.
           </p>
         </div>
 
-        {/* Shop Organic Foods Button - Positioned above carousel */}
+        {/* Shop Products Button - Positioned above carousel */}
         <div className="mb-8 flex justify-center relative z-20">
           <Link
             href="/shop"
             className="group relative inline-flex items-center justify-center rounded-full bg-primary-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-primary-600/20 transition-all duration-300 hover:bg-primary-700 hover:shadow-xl hover:shadow-primary-600/30 hover:-translate-y-0.5 focus:outline-none focus:outline-none sm:px-10 sm:py-4.5"
           >
-            Shop Organic Foods
+            Shop Products
             <svg
               className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
               fill="none"
