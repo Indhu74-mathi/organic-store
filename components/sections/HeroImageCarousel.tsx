@@ -62,7 +62,7 @@ export default function HeroImageCarousel() {
 
   return (
     <section
-      className="relative mx-auto mb-0 mt-8 w-full px-0 sm:mt-12"
+      className="relative -mx-4 mb-0 mt-0 w-[calc(100%+2rem)] sm:-mx-6 sm:w-[calc(100%+3rem)] lg:-mx-8 lg:w-[calc(100%+4rem)]"
       aria-label="Hero image carousel"
     >
       <div
@@ -79,12 +79,12 @@ export default function HeroImageCarousel() {
             <Link
               key={image.src}
               href="/shop"
-              className="absolute inset-0 transition-all duration-[2000ms] ease-in-out cursor-pointer"
+              className="absolute inset-0 transition-all duration-[3000ms] ease-in-out cursor-pointer"
               style={{
                 opacity: isActive ? 1 : 0,
                 zIndex: isActive ? 1 : 0,
-                filter: isActive ? 'blur(0px)' : 'blur(3px)',
-                transform: isActive ? 'scale(1)' : 'scale(1.03)',
+                filter: isActive ? 'blur(0px) brightness(0.98)' : 'blur(4px) brightness(0.95)',
+                transform: isActive ? 'scale(1)' : 'scale(1.05)',
               }}
               aria-hidden={!isActive}
               aria-label="Browse our malt and traditional products"
@@ -92,7 +92,7 @@ export default function HeroImageCarousel() {
               <div 
                 className="absolute inset-0"
                 style={{
-                  filter: 'brightness(0.96) contrast(1.03) saturate(1.05)',
+                  filter: 'brightness(0.98) contrast(1.02) saturate(1.03)',
                 }}
               >
                 <Image
@@ -101,26 +101,40 @@ export default function HeroImageCarousel() {
                   fill
                   priority={index === 0}
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+                  sizes="100vw"
                 />
               </div>
-              {/* Subtle gradient overlay for natural blending */}
+              {/* Top and bottom fade gradients for seamless blending */}
               <div 
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, transparent 12%, transparent 88%, rgba(0,0,0,0.08) 100%)',
+                  background: `
+                    linear-gradient(to bottom, 
+                      rgba(255,255,255,0.4) 0%, 
+                      rgba(255,255,255,0.15) 8%, 
+                      transparent 15%, 
+                      transparent 85%, 
+                      rgba(0,0,0,0.15) 92%, 
+                      rgba(0,0,0,0.3) 100%
+                    )
+                  `,
                 }}
               />
             </Link>
           )
         })}
-        {/* Edge fade gradients for natural blending into background */}
+        {/* Side edge fade gradients for seamless blending */}
         <div 
           className="absolute inset-0 pointer-events-none z-10"
           style={{
-            background: 'linear-gradient(to bottom, rgba(255,255,255,0.25) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.15) 100%)',
-            maskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)',
+            background: `
+              linear-gradient(to right, 
+                rgba(255,255,255,0.3) 0%, 
+                transparent 5%, 
+                transparent 95%, 
+                rgba(255,255,255,0.3) 100%
+              )
+            `,
           }}
         />
       </div>
