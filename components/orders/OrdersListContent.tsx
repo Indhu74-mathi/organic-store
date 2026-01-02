@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
 import AnimatedPage from '@/components/AnimatedPage'
+import { formatDateShortIST } from '@/lib/utils'
 
 interface OrderItem {
   productName: string
@@ -149,10 +150,7 @@ export default function OrdersListContent({
             ) ?? 0)
             // totalAmount from API is already in rupees (converted from paise)
             const totalInRupees = order.totalAmount
-            const orderDate = new Date(order.createdAt).toLocaleDateString(
-              'en-IN',
-              { year: 'numeric', month: 'short', day: 'numeric' }
-            )
+            const orderDate = formatDateShortIST(order.createdAt)
 
             return (
               <Link

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
 import AnimatedPage from '@/components/AnimatedPage'
 import { calculateDiscountedPrice } from '@/lib/pricing'
+import { formatDateIST } from '@/lib/utils'
 
 interface OrderItem {
   productId: string
@@ -464,12 +465,13 @@ export default function AdminOrderDetailContent({ orderId }: AdminOrderDetailCon
                     <div className="flex items-center justify-between">
                       <span className="text-neutral-600">Paid At</span>
                       <span className="text-neutral-900">
-                        {new Date(order.paidAt).toLocaleDateString('en-IN', {
+                        {formatDateIST(order.paidAt, {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
+                          timeZone: 'Asia/Kolkata',
                         })}
                       </span>
                     </div>
@@ -490,12 +492,13 @@ export default function AdminOrderDetailContent({ orderId }: AdminOrderDetailCon
                   <div className="flex items-center justify-between">
                     <span className="text-neutral-600">Order Date</span>
                     <span className="text-neutral-900">
-                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                      {formatDateIST(order.createdAt, {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
+                        timeZone: 'Asia/Kolkata',
                       })}
                     </span>
                   </div>
@@ -503,12 +506,13 @@ export default function AdminOrderDetailContent({ orderId }: AdminOrderDetailCon
                     <div className="flex items-center justify-between">
                       <span className="text-neutral-600">Last Updated</span>
                       <span className="text-neutral-900">
-                        {new Date(order.updatedAt).toLocaleDateString('en-IN', {
+                        {formatDateIST(order.updatedAt, {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
+                          timeZone: 'Asia/Kolkata',
                         })}
                       </span>
                     </div>

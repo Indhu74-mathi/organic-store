@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { formatDateShortIST } from '@/lib/utils'
 
 interface Order {
   id: string
@@ -178,11 +179,7 @@ export default function AdminOrdersList({ accessToken }: AdminOrdersListProps) {
                         {order.userId?.substring(0, 8) || 'N/A'}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-neutral-500">
-                        {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
+                        {formatDateShortIST(order.createdAt)}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4">
                         <span className={getStatusBadge(order.status)}>{order.status}</span>

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useAuth } from '@/components/auth/AuthContext'
 import AnimatedPage from '@/components/AnimatedPage'
 import { calculateDiscountedPrice } from '@/lib/pricing'
+import { formatDateIST } from '@/lib/utils'
 
 // Razorpay is loaded dynamically from CDN
 interface RazorpayConstructor {
@@ -589,12 +590,13 @@ export default function OrderDetailContent({ orderId }: OrderDetailContentProps)
                   <div className="flex items-center justify-between">
                     <span className="text-neutral-600">Order Date</span>
                     <span className="text-neutral-900">
-                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                      {formatDateIST(order.createdAt, {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
+                        timeZone: 'Asia/Kolkata',
                       })}
                     </span>
                   </div>
