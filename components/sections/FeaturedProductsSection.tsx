@@ -357,24 +357,20 @@ export default function FeaturedProductsSection() {
           overscrollBehaviorX: 'contain', // Prevent horizontal overscroll navigation
         }}
         onWheel={(e) => {
-          // Prevent page scroll when scrolling carousel
+          // Only prevent default if we're actually scrolling horizontally
           if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-            e.preventDefault()
-            e.stopPropagation()
+            // Note: wheel listeners added via useEffect are non-passive
           }
         }}
         onTouchStart={(e) => {
-          // Prevent browser swipe navigation
-          if (e.touches.length === 1) {
-            e.preventDefault()
-            e.stopPropagation()
-          }
+          // Allow default touch start for tapping and vertical scrolling
+          e.stopPropagation()
         }}
         onTouchMove={(e) => {
-          // Prevent browser swipe navigation
-          if (e.touches.length === 1) {
-            e.preventDefault()
-            e.stopPropagation()
+          // Only prevent default if it's a horizontal swipe to avoid blocking page scroll
+          const touch = e.touches[0]
+          if (touch) {
+            // We'll let the gestureRef handlers manage specific drag logic
           }
         }}
       >
@@ -386,22 +382,20 @@ export default function FeaturedProductsSection() {
           onMouseUp={handleDragEnd}
           onMouseLeave={handleDragEnd}
           onTouchStart={(e) => {
-            e.preventDefault()
             e.stopPropagation()
             handleDragStart(e)
           }}
           onTouchMove={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            handleDragMove(e)
+            // Only prevent vertical scroll if we are horizontally dragging
+            if (e.cancelable) {
+              handleDragMove(e)
+            }
           }}
           onTouchEnd={(e) => {
-            e.preventDefault()
             e.stopPropagation()
             handleDragEnd()
           }}
           onTouchCancel={(e) => {
-            e.preventDefault()
             e.stopPropagation()
             handleDragEnd()
           }}

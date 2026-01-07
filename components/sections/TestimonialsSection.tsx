@@ -111,13 +111,10 @@ export default function TestimonialsSection() {
                         {/* Abstract organic pattern background */}
                         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-neutral-800 to-neutral-900 opacity-50"></div>
                         <Image
-                            src="/path/to/placeholder-cover.jpg"
+                            src="/millet.png"
                             alt="Video placeholder"
                             fill
                             className="object-cover -z-20 opacity-30 mix-blend-overlay"
-                            // Using a tiny base64 placeholder to prevent errors if image missing
-                            placeholder="blur"
-                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
                         />
                     </div>
                 </div>
