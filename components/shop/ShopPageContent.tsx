@@ -4,7 +4,7 @@ import AnimatedPage from '@/components/AnimatedPage'
 import ProductCard from '@/components/products/ProductCard'
 import ShopFilters from '@/components/shop/ShopFilters'
 import { useMemo, useState, useEffect } from 'react'
-import type { Product } from '@/types'
+import type { Product, ProductVariant } from '@/types'
 
 export default function ShopPageContent() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
@@ -37,7 +37,7 @@ export default function ShopPageContent() {
           imageUrl: string
           stock: number
           inStock: boolean
-          variants?: any[]
+          variants?: ProductVariant[]
         }) => ({
           id: p.id,
           slug: p.slug,

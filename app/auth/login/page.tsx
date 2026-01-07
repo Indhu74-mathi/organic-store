@@ -137,7 +137,7 @@ function LoginFormContent() {
     <AuthLayout
       title="Welcome back"
       subtitle="Sign in to your account to continue shopping."
-      imageSrc="/image1.png"
+      imageSrc="/auth-bg-login.png"
     >
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         {errors.general && (
@@ -268,7 +268,7 @@ function LoginFormFallback() {
     <AuthLayout
       title="Welcome back"
       subtitle="Sign in to your account to continue shopping."
-      imageSrc="/image1.png"
+      imageSrc="/auth-bg-login.png"
     >
       <div className="space-y-6">
         <div className="h-10 animate-pulse rounded bg-neutral-200" />

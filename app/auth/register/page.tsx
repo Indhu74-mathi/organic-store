@@ -169,7 +169,7 @@ function RegisterFormContent() {
     <AuthLayout
       title="Create account"
       subtitle="Start shopping organic products today."
-      imageSrc="/image2.png"
+      imageSrc="/auth-bg-register.png"
     >
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         {errors.general && (
@@ -348,7 +348,7 @@ function RegisterFormFallback() {
     <AuthLayout
       title="Create account"
       subtitle="Start shopping organic products today."
-      imageSrc="/image2.png"
+      imageSrc="/auth-bg-register.png"
     >
       <div className="space-y-6">
         <div className="h-10 animate-pulse rounded bg-neutral-200" />

@@ -86,15 +86,37 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
       p.name?.toLowerCase().trim() === decodedSlug.toLowerCase().trim()
   )
 
+  interface DBVariant {
+    id: string
+    sizeGrams: number
+    price: number
+    stock: number
+  }
+
+  interface DBProduct {
+    id: string
+    slug: string
+    name: string
+    description: string
+    price: number
+    discountPercent: number
+    imageUrl: string
+    category: string
+    stock: number
+    isActive: boolean
+  }
+
+  // ... existing code ...
+
   if (!product) {
     notFound()
   }
 
-  const productData: any = product
+  const productData = product as DBProduct
   const usesVariants = hasVariants(productData.category)
 
   // Fetch variants separately if this product uses variants
-  let variants: any[] = []
+  let variants: DBVariant[] = []
   if (usesVariants) {
     const { data: variantData, error: variantError } = await supabase
       .from('ProductVariant')
@@ -106,7 +128,7 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
       console.error('[Product Slug Page] Variant fetch error:', variantError)
       // Don't fail the page if variants fail - just use empty array
     } else {
-      variants = variantData || []
+      variants = (variantData as DBVariant[]) || []
     }
   }
 
@@ -116,8 +138,8 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
   let stock: number
 
   if (usesVariants) {
-    const hasStock = variants.some((v: any) => v.stock > 0)
-    const totalStock = variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
+    const hasStock = variants.some((v) => v.stock > 0)
+    const totalStock = variants.reduce((sum, v) => sum + (v.stock || 0), 0)
     inStock = productData.isActive && hasStock
     stock = totalStock
   } else {
@@ -139,7 +161,7 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
     stock: stock,
     // Include variants for variant-based products
     ...(usesVariants && {
-      variants: variants.map((v: any) => ({
+      variants: variants.map((v) => ({
         id: v.id,
         sizeGrams: v.sizeGrams,
         price: v.price / 100, // Convert paise to rupees

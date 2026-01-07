@@ -102,8 +102,9 @@ export default function FeaturedProductsSection() {
   const oneSetWidth = products.length > 0 ? products.length * itemWidth : 0
 
   // Drag handlers - directly mutate positionX
-  const handleDragStart = (e: any) => {
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+  const handleDragStart = (e: React.MouseEvent | React.TouchEvent) => {
+    // @ts-expect-error - TouchEvent/MouseEvent union complexity
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
 
     // If it's not a touch event, we might need to prevent default
     if (e.cancelable && e.type !== 'mousedown') {
@@ -120,7 +121,7 @@ export default function FeaturedProductsSection() {
     lastUpdateTime.current = Date.now()
   }
 
-  const handleDragMove = (e: any) => {
+  const handleDragMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDragging) return
 
     if (e.cancelable) {
@@ -128,7 +129,8 @@ export default function FeaturedProductsSection() {
     }
     e.stopPropagation()
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    // @ts-expect-error - TouchEvent/MouseEvent union complexity
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
     const deltaX = clientX - lastDragX.current
     lastDragX.current = clientX
 

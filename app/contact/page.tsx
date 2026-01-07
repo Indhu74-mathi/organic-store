@@ -11,7 +11,7 @@ export default function ContactPage() {
                     <div className="mx-auto max-w-2xl text-center mb-16">
                         <h1 className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">Contact Us</h1>
                         <p className="mt-4 text-lg text-neutral-600">
-                            We'd love to hear from you. Visit our store or reach out with any questions about our traditional millet products.
+                            We&apos;d love to hear from you. Visit our store or reach out with any questions about our traditional millet products.
                         </p>
                     </div>
 

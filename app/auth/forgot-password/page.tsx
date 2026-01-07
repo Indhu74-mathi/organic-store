@@ -99,7 +99,7 @@ function ForgotPasswordFormContent() {
     <AuthLayout
       title="Forgot Password"
       subtitle="Enter your email address and we'll send you a link to reset your password."
-      imageSrc="/image3.png"
+      imageSrc="/auth-bg-forgot.png"
     >
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-6" noValidate>
@@ -161,7 +161,7 @@ function ForgotPasswordFormContent() {
         </div>
       </form>
 
-      <div className="text-center text-sm text-neutral-600">
+      <div className="mt-6 text-center text-sm text-neutral-600">
         <Link
           href="/auth/login"
           className="font-medium text-primary-600 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
@@ -181,7 +181,7 @@ function ForgotPasswordFormFallback() {
     <AuthLayout
       title="Forgot Password"
       subtitle="Enter your email address and we'll send you a link to reset your password."
-      imageSrc="/image3.png"
+      imageSrc="/auth-bg-forgot.png"
     >
       <div className="mt-8">
         <div className="h-12 w-full animate-pulse rounded-xl bg-neutral-200" />
