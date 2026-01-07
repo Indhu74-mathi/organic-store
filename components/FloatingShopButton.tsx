@@ -9,9 +9,30 @@ export default function FloatingShopButton() {
   const pathname = usePathname()
   const { role, user } = useAuth()
   const [mounted, setMounted] = useState(false)
+  const [isFooterVisible, setIsFooterVisible] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry) {
+          setIsFooterVisible(entry.isIntersecting)
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    const footer = document.getElementById('main-footer')
+    if (footer) {
+      observer.observe(footer)
+    }
+
+    return () => {
+      if (footer) {
+        observer.unobserve(footer)
+      }
+    }
   }, [])
 
   // Hide on admin pages
@@ -24,7 +45,10 @@ export default function FloatingShopButton() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-40 mb-[env(safe-area-inset-bottom)] mr-[env(safe-area-inset-right)] sm:bottom-4 sm:right-8">
+    <div
+      className={`pointer-events-none fixed right-6 z-40 transition-all duration-500 ease-in-out mb-[env(safe-area-inset-bottom)] mr-[env(safe-area-inset-right)] sm:right-8 ${isFooterVisible ? 'bottom-[360px] sm:bottom-[310px]' : 'bottom-6 sm:bottom-4'
+        }`}
+    >
       <Link
         href="/shop"
         aria-label="Shop organic food"

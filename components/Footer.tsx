@@ -15,7 +15,7 @@ import GoogleMapEmbed from './ui/GoogleMapEmbed'
  */
 export default function Footer() {
   return (
-    <footer className="bg-neutral-900 text-neutral-300 border-t border-neutral-800">
+    <footer id="main-footer" className="bg-neutral-900 text-neutral-300 border-t border-neutral-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand & Description */}
@@ -127,13 +127,13 @@ export default function Footer() {
             </p>
             <div className="flex gap-6 text-sm text-neutral-400">
               <Link
-                href="/shop"
+                href="/terms"
                 className="hover:text-primary-400 transition-colors"
               >
                 Terms
               </Link>
               <Link
-                href="/shop"
+                href="/privacy"
                 className="hover:text-primary-400 transition-colors"
               >
                 Privacy

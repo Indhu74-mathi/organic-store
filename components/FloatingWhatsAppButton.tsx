@@ -8,9 +8,30 @@ export default function FloatingWhatsAppButton() {
   const pathname = usePathname()
   const { role, user } = useAuth()
   const [mounted, setMounted] = useState(false)
+  const [isFooterVisible, setIsFooterVisible] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry) {
+          setIsFooterVisible(entry.isIntersecting)
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    const footer = document.getElementById('main-footer')
+    if (footer) {
+      observer.observe(footer)
+    }
+
+    return () => {
+      if (footer) {
+        observer.unobserve(footer)
+      }
+    }
   }, [])
 
   // Hide on admin pages
@@ -30,7 +51,10 @@ export default function FloatingWhatsAppButton() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-20 right-6 z-40 mb-[env(safe-area-inset-bottom)] mr-[env(safe-area-inset-right)] sm:bottom-22 sm:right-8">
+    <div
+      className={`pointer-events-none fixed right-6 z-40 transition-all duration-500 ease-in-out mb-[env(safe-area-inset-bottom)] mr-[env(safe-area-inset-right)] sm:right-8 ${isFooterVisible ? 'bottom-[420px] sm:bottom-[380px]' : 'bottom-20 sm:bottom-22'
+        }`}
+    >
       <button
         type="button"
         onClick={handleWhatsAppClick}
