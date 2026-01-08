@@ -27,47 +27,25 @@ export function calculateDiscountedPrice(
   return Math.round(discountedPrice)
 }
 
-/**
- * Shared South Indian states for elevated shipping (₹70)
- */
-const SOUTH_STATES_EXTENDED = [
-  'kerala',
-  'karnataka',
-  'andhra pradesh',
-  'telangana'
-]
+
 
 /**
  * Central logic for shipping fee calculation based on subtotal and state.
  * 
  * Rules:
  * - Free Shipping: Order >= ₹1000
- * - Tamil Nadu: ₹40
- * - South States (KL, KA, AP, TS): ₹70
- * - Rest of India: ₹100
+ * - All States: ₹40 (uniform base shipping fee)
  * 
  * @param subtotalInRupees - Order subtotal in rupees
- * @param stateName - Shipping state name
+ * @param stateName - Shipping state name (currently unused, kept for future location-based pricing)
  * @returns Shipping fee in rupees
  */
-export function calculateShippingFee(subtotalInRupees: number, stateName: string): number {
+export function calculateShippingFee(subtotalInRupees: number, _stateName: string): number {
   if (subtotalInRupees >= 1000) {
     return 0
   }
 
-  const normalized = stateName.toLowerCase().trim()
-
-  // Tamil Nadu specific
-  if (normalized === 'tamil nadu' || normalized === 'tn' || normalized === 'tamilnadu') {
-    return 40
-  }
-
-  // South Indian states (excluding TN which is handled above)
-  if (SOUTH_STATES_EXTENDED.some(s => normalized.includes(s))) {
-    return 70
-  }
-
-  // Rest of India
-  return 100
+  // Uniform base shipping fee for all of India
+  return 40
 }
 

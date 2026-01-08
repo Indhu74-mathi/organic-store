@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase'
 import { createSupabaseServer } from '@/lib/supabase/server'
 import { createErrorResponse } from '@/lib/auth/api-auth'
 import { hasVariants } from '@/lib/products'
+import { getProductImages } from '@/lib/products-server'
 
 export const runtime = "nodejs"
 
@@ -86,14 +87,14 @@ export async function GET(_req: NextRequest) {
     const variantIds = cartItems
       .map((item) => item.variantId)
       .filter((id: string | null): id is string => id !== null && id !== undefined)
-    
+
     let variants: any[] = []
     if (variantIds.length > 0) {
       const { data: variantsData, error: variantsError } = await supabase
         .from('ProductVariant')
         .select('id, productId, sizeGrams, price, stock')
         .in('id', variantIds)
-      
+
       if (variantsError) {
         console.error('[API Cart] Failed to fetch variants:', variantsError)
         // Continue without variants - non-critical
@@ -123,6 +124,25 @@ export async function GET(_req: NextRequest) {
           }
         }
 
+
+        // Debug logging for elephant product
+        if (product.name.toLowerCase().includes('elephant')) {
+          console.log('[CART DEBUG] Elephant product found:')
+          console.log('  - Product Name:', product.name)
+          console.log('  - Category:', product.category)
+          console.log('  - DB imageUrl:', product.imageUrl)
+        }
+
+        // Always use getProductImages - it validates DB URL and discovers correct path
+        const discoveredImages = getProductImages(product.category, product.name, product.imageUrl)
+        const productImage = discoveredImages.length > 0 ? discoveredImages[0] : '/products/misc/placeholder.jpg'
+
+        if (product.name.toLowerCase().includes('elephant')) {
+          console.log('  - Discovered images:', discoveredImages)
+          console.log('  - Selected image:', productImage)
+        }
+
+
         return {
           cartItemId: item.id,
           product: {
@@ -133,7 +153,7 @@ export async function GET(_req: NextRequest) {
             price: price,
             discountPercent: product.discountPercent,
             category: product.category,
-            image: product.imageUrl,
+            image: productImage,
             inStock: product.isActive && stock > 0,
             stock: stock,
             ...(usesVariants && sizeGrams && { sizeGrams }),
