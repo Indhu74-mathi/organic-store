@@ -22,26 +22,28 @@ interface ProductDetailPageContentProps {
 export default function ProductDetailPageContent({
   product,
 }: ProductDetailPageContentProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [imageError, setImageError] = useState(false)
   const [stockError, setStockError] = useState<string | null>(null)
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null)
   const { addItem } = useCart()
 
+  const images = product.images && product.images.length > 0 ? product.images : [product.image]
   const usesVariants = hasVariants(product.category)
   const variants = product.variants || []
-  
+
   // For variant-based products (Malt, saadha podi), use selected variant stock; otherwise use product stock
-  const selectedVariant = usesVariants && selectedVariantId 
+  const selectedVariant = usesVariants && selectedVariantId
     ? variants.find(v => v.id === selectedVariantId)
     : null
-  
-  const availableStock = selectedVariant 
-    ? selectedVariant.stock 
+
+  const availableStock = selectedVariant
+    ? selectedVariant.stock
     : (product.stock ?? 0)
-  
-  const displayPrice = selectedVariant 
-    ? selectedVariant.price 
+
+  const displayPrice = selectedVariant
+    ? selectedVariant.price
     : product.price
 
   const isLowStock = availableStock > 0 && availableStock < 20
@@ -61,35 +63,88 @@ export default function ProductDetailPageContent({
     setStockError(null)
   }
 
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % images.length)
+  }
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
+  }
+
   return (
     <AnimatedPage>
       <section className="py-10 sm:py-12 lg:py-16">
         <div className="grid gap-8 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-start">
-          {/* Image / media */}
-          <motion.div
-            className="relative product-detail-image-container rounded-3xl border border-neutral-200 bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200"
-            initial={{ opacity: 0.9, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-          >
-            {!imageError && product.image ? (
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={500}
-                height={800}
-                className="product-detail-image"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-                onError={() => setImageError(true)}
-                style={{ objectFit: 'contain' }}
-              />
-            ) : (
-              <div className="flex h-full min-h-[200px] items-center justify-center">
-                <div className="h-20 w-20 rounded-full bg-white/70 shadow-sm" />
+          {/* Image / media Gallery */}
+          <div className="space-y-4">
+            <motion.div
+              className="relative product-detail-image-container group rounded-3xl border border-neutral-200 bg-gradient-to-br from-neutral-100 via-neutral-50 to-neutral-200 aspect-square overflow-hidden"
+              initial={{ opacity: 0.9, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            >
+              {!imageError && images[currentImageIndex] ? (
+                <Image
+                  src={images[currentImageIndex]}
+                  alt={`${product.name} - View ${currentImageIndex + 1}`}
+                  fill
+                  className="product-detail-image object-contain p-4"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="flex h-full min-h-[200px] items-center justify-center">
+                  <div className="h-20 w-20 rounded-full bg-white/70 shadow-sm" />
+                </div>
+              )}
+
+              {/* Navigation Arrows */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 text-neutral-800 shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-10"
+                    aria-label="Previous image"
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 text-neutral-800 shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-10"
+                    aria-label="Next image"
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </motion.div>
+
+            {/* Thumbnails */}
+            {images.length > 1 && (
+              <div className="flex flex-wrap gap-2 px-1">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`relative h-20 w-20 overflow-hidden rounded-xl border-2 transition-all ${currentImageIndex === idx ? 'border-primary-600 scale-105 shadow-sm' : 'border-neutral-200 opacity-60 hover:opacity-100'
+                      }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
               </div>
             )}
-          </motion.div>
+          </div>
 
           {/* Details */}
           <div className="space-y-6">
@@ -127,13 +182,12 @@ export default function ProductDetailPageContent({
                           setStockError(null)
                         }}
                         disabled={variant.stock === 0}
-                        className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
-                          selectedVariantId === variant.id
-                            ? 'bg-primary-600 text-white shadow-md'
-                            : variant.stock === 0
+                        className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${selectedVariantId === variant.id
+                          ? 'bg-primary-600 text-white shadow-md'
+                          : variant.stock === 0
                             ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
                             : 'bg-white border-2 border-neutral-200 text-neutral-700 hover:border-primary-400 hover:text-primary-700'
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-col items-center">
                           <span>{variant.sizeGrams}g</span>
@@ -203,7 +257,7 @@ export default function ProductDetailPageContent({
                 </span>
               )}
             </div>
-            
+
             {/* Stock error message */}
             {stockError && (
               <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">

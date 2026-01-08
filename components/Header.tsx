@@ -205,8 +205,8 @@ export default function Header() {
                   href="/shop"
                   aria-label="Browse organic products"
                   className={`text-sm font-medium transition-colors duration-200 focus:outline-none rounded ${isActive('/shop')
-                      ? 'text-primary-600'
-                      : 'text-neutral-700 hover:text-primary-600'
+                    ? 'text-primary-600'
+                    : 'text-neutral-700 hover:text-primary-600'
                     }`}
                 >
                   Shop
@@ -217,8 +217,8 @@ export default function Header() {
                     href="/orders"
                     aria-label="View my orders"
                     className={`text-sm font-medium transition-colors duration-200 focus:outline-none rounded ${isActive('/orders')
-                        ? 'text-primary-600'
-                        : 'text-neutral-700 hover:text-primary-600'
+                      ? 'text-primary-600'
+                      : 'text-neutral-700 hover:text-primary-600'
                       }`}
                   >
                     Orders
@@ -278,8 +278,8 @@ export default function Header() {
                       href="/auth/login"
                       aria-label="Sign in to your account"
                       className={`text-sm font-medium transition-colors duration-200 focus:outline-none rounded ${isActive('/auth/login')
-                          ? 'text-primary-600'
-                          : 'text-neutral-700 hover:text-primary-600'
+                        ? 'text-primary-600'
+                        : 'text-neutral-700 hover:text-primary-600'
                         }`}
                     >
                       Login
@@ -289,8 +289,8 @@ export default function Header() {
                       href="/auth/register"
                       aria-label="Create a new account"
                       className={`text-sm font-medium transition-colors duration-200 focus:outline-none rounded ${isActive('/auth/register')
-                          ? 'text-primary-600'
-                          : 'text-neutral-700 hover:text-primary-600'
+                        ? 'text-primary-600'
+                        : 'text-neutral-700 hover:text-primary-600'
                         }`}
                     >
                       Register
@@ -436,8 +436,8 @@ export default function Header() {
                   href="/shop"
                   aria-label="Browse organic products"
                   className={`block rounded-md px-3 py-2 text-base font-medium transition-colors duration-200 focus:outline-none ${isActive('/shop')
-                      ? 'bg-primary-50 text-primary-600'
-                      : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
+                    ? 'bg-primary-50 text-primary-600'
+                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
                     }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -449,8 +449,8 @@ export default function Header() {
                     href="/orders"
                     aria-label="View my orders"
                     className={`block rounded-md px-3 py-2 text-base font-medium transition-colors duration-200 focus:outline-none ${isActive('/orders')
-                        ? 'bg-primary-50 text-primary-600'
-                        : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
+                      ? 'bg-primary-50 text-primary-600'
+                      : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
                       }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -508,8 +508,8 @@ export default function Header() {
                   href="/auth/login"
                   aria-label="Sign in to your account"
                   className={`block rounded-md px-3 py-2 text-base font-medium transition-colors duration-200 focus:outline-none ${isActive('/auth/login')
-                      ? 'bg-primary-50 text-primary-600'
-                      : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
+                    ? 'bg-primary-50 text-primary-600'
+                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
                     }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -520,8 +520,8 @@ export default function Header() {
                   href="/auth/register"
                   aria-label="Create a new account"
                   className={`block rounded-md px-3 py-2 text-base font-medium transition-colors duration-200 focus:outline-none ${isActive('/auth/register')
-                      ? 'bg-primary-50 text-primary-600'
-                      : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
+                    ? 'bg-primary-50 text-primary-600'
+                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-primary-600'
                     }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

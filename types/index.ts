@@ -27,6 +27,7 @@ export interface Product {
   originalPrice?: number // Deprecated: use discountPercent instead
   category: string
   image: string
+  images?: string[]
   inStock: boolean
   stock?: number // Current stock quantity
   rating?: number

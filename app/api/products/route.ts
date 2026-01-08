@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { createErrorResponse } from '@/lib/auth/api-auth'
 
-// Edge runtime for better performance on public read-only endpoint
-export const runtime = 'edge'
+// Node runtime is more stable for Supabase calls here
+// export const runtime = 'edge'
 
 /**
  * GET /api/products
@@ -75,12 +75,12 @@ export async function GET(_req: NextRequest) {
     const mappedProducts = products.map((p: any) => {
       const usesVariants = hasVariants(p.category)
       const variants = p.ProductVariant || []
-      
+
       // For variant-based products: check if any variant has stock
       // For non-variant products: use product stock
       let inStock: boolean
       let stock: number
-      
+
       if (usesVariants) {
         const hasStock = variants.some((v: any) => v.stock > 0)
         const totalStock = variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
@@ -96,6 +96,19 @@ export async function GET(_req: NextRequest) {
         return null
       }
 
+      // Discover images resilience
+      let allImages: string[] = []
+      try {
+        // We use the server-side discovery logic
+        // Since we are in the API route (server-side), we can import it
+        const { getProductImages } = require('@/lib/products-server')
+        allImages = getProductImages(p.category, p.name, p.imageUrl)
+      } catch (e) {
+        console.error('Error discovering images for', p.name, e)
+      }
+
+      const finalImage = allImages.length > 0 ? allImages[0] : p.imageUrl
+
       return {
         id: p.id,
         name: p.name,
@@ -103,12 +116,13 @@ export async function GET(_req: NextRequest) {
         description: p.description,
         price: p.price / 100, // Convert paise to rupees - base price for non-variant products
         discountPercent: p.discountPercent,
-        imageUrl: p.imageUrl,
+        imageUrl: finalImage,
         category: p.category,
         stock: stock,
         inStock: inStock,
         isActive: p.isActive,
-        image: p.imageUrl,
+        image: finalImage,
+        images: allImages,
         // Include variants for variant-based products
         ...(usesVariants && {
           variants: variants.map((v: any) => ({
@@ -120,7 +134,7 @@ export async function GET(_req: NextRequest) {
           })),
         }),
       }
-    }).filter((p): p is NonNullable<typeof p> => p !== null)
+    }).filter((p: any): p is NonNullable<typeof p> => p !== null)
 
     // Cache public read-only endpoint for 60s, allow stale for 300s
     return NextResponse.json(

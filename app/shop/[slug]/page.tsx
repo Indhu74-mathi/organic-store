@@ -148,6 +148,13 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
   }
 
   // Map to Product type expected by component
+  // Get additional images from filesystem
+  const { getProductImages } = await import('@/lib/products-server')
+  const extraImages = getProductImages(productData.category, productData.name, productData.imageUrl)
+
+  // Trust the server utility to handle main image and gallery discovery
+  const allImages = extraImages.filter(Boolean) as string[]
+
   const mappedProduct = {
     id: productData.id,
     slug: productData.slug,
@@ -156,7 +163,8 @@ export default async function ProductSlugPage({ params }: ProductSlugPageProps) 
     price: productData.price / 100, // Convert paise to rupees
     discountPercent: productData.discountPercent,
     category: productData.category,
-    image: productData.imageUrl,
+    image: allImages[0] || productData.imageUrl,
+    images: allImages,
     inStock: inStock,
     stock: stock,
     // Include variants for variant-based products

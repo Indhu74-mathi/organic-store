@@ -19,13 +19,13 @@ export default function AuthLayout({
     imageSrc = '/auth-bg-login.png',
 }: AuthLayoutProps) {
     return (
-        <div className="flex min-h-screen w-full items-center justify-center bg-stone-100 lg:p-8 sm:p-6 p-0">
-            {/* Main Floating Box - Full screen on mobile, rounded box on desktop */}
+        <div className="flex min-h-screen w-full items-center justify-center bg-stone-100 lg:p-8 sm:p-6 pt-0 pb-10 px-0">
+            {/* Main Floating Box - Full width on mobile with bottom margin, rounded box on desktop */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="relative w-full h-screen sm:h-auto sm:max-w-[500px] lg:max-w-[600px] overflow-hidden sm:rounded-[2.5rem] rounded-none bg-neutral-900 shadow-2xl flex flex-col"
+                className="relative w-full sm:h-auto sm:max-w-[500px] lg:max-w-[600px] overflow-hidden sm:rounded-[2.5rem] rounded-none bg-neutral-900 shadow-2xl flex flex-col"
             >
                 {/* Background Image Layer */}
                 <div className="absolute inset-0 z-0">
