@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/auth/AuthContext'
 import { useCart } from '@/components/cart/CartContext'
@@ -8,6 +8,18 @@ import AnimatedPage from '@/components/AnimatedPage'
 import { calculateDiscountedPrice, calculateShippingFee } from '@/lib/pricing'
 import Image from 'next/image'
 import Script from 'next/script'
+
+// Indian States List
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+  'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+]
 
 // Razorpay is loaded dynamically from CDN
 interface RazorpayConstructor {
@@ -64,6 +76,79 @@ export default function CheckoutReviewContent() {
     postalCode: '',
     country: 'IN',
   })
+
+  // State dropdown autocomplete
+  const [stateInput, setStateInput] = useState('')
+  const [showStateDropdown, setShowStateDropdown] = useState(false)
+  const [filteredStates, setFilteredStates] = useState<string[]>(INDIAN_STATES)
+  const [selectedStateIndex, setSelectedStateIndex] = useState(-1)
+  const stateDropdownRef = useRef<HTMLDivElement>(null)
+  const stateInputRef = useRef<HTMLInputElement>(null)
+
+  // Filter states based on input
+  useEffect(() => {
+    if (stateInput.trim() === '') {
+      setFilteredStates(INDIAN_STATES)
+    } else {
+      const filtered = INDIAN_STATES.filter(state =>
+        state.toLowerCase().startsWith(stateInput.toLowerCase())
+      )
+      setFilteredStates(filtered)
+    }
+    setSelectedStateIndex(-1)
+  }, [stateInput])
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (stateDropdownRef.current && !stateDropdownRef.current.contains(event.target as Node)) {
+        setShowStateDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Handle state selection
+  const handleStateSelect = (state: string) => {
+    setStateInput(state)
+    setAddress({ ...address, state })
+    setShowStateDropdown(false)
+  }
+
+  // Handle keyboard navigation
+  const handleStateKeyDown = (e: React.KeyboardEvent) => {
+    if (!showStateDropdown) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter') {
+        setShowStateDropdown(true)
+      }
+      return
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setSelectedStateIndex(prev =>
+          prev < filteredStates.length - 1 ? prev + 1 : prev
+        )
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setSelectedStateIndex(prev => prev > 0 ? prev - 1 : -1)
+        break
+      case 'Enter':
+        e.preventDefault()
+        if (selectedStateIndex >= 0 && filteredStates[selectedStateIndex]) {
+          handleStateSelect(filteredStates[selectedStateIndex])
+        } else if (filteredStates.length === 1 && filteredStates[0]) {
+          handleStateSelect(filteredStates[0])
+        }
+        break
+      case 'Escape':
+        setShowStateDropdown(false)
+        break
+    }
+  }
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -517,17 +602,53 @@ export default function CheckoutReviewContent() {
                         className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                       />
                     </div>
-                    <div>
+                    <div className="relative" ref={stateDropdownRef}>
                       <label className="block text-sm font-medium text-neutral-700">
                         State <span className="text-red-500">*</span>
                       </label>
                       <input
+                        ref={stateInputRef}
                         type="text"
                         required
-                        value={address.state}
-                        onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                        value={stateInput}
+                        onChange={(e) => {
+                          setStateInput(e.target.value)
+                          setShowStateDropdown(true)
+                          // Update address state only if exact match
+                          const exactMatch = INDIAN_STATES.find(s => s.toLowerCase() === e.target.value.toLowerCase())
+                          if (exactMatch) {
+                            setAddress({ ...address, state: exactMatch })
+                          } else {
+                            setAddress({ ...address, state: e.target.value })
+                          }
+                        }}
+                        onFocus={() => setShowStateDropdown(true)}
+                        onKeyDown={handleStateKeyDown}
                         className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        placeholder="Start typing to search..."
+                        autoComplete="off"
                       />
+                      {showStateDropdown && filteredStates.length > 0 && (
+                        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-neutral-300 bg-white shadow-lg">
+                          {filteredStates.map((state, index) => (
+                            <div
+                              key={state}
+                              onClick={() => handleStateSelect(state)}
+                              className={`cursor-pointer px-3 py-2 text-sm transition-colors ${index === selectedStateIndex
+                                ? 'bg-primary-100 text-primary-900'
+                                : 'hover:bg-neutral-50'
+                                }`}
+                            >
+                              {state}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {showStateDropdown && filteredStates.length === 0 && (
+                        <div className="absolute z-10 mt-1 w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-500 shadow-lg">
+                          No states found
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -552,6 +673,20 @@ export default function CheckoutReviewContent() {
                         className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                         disabled
                       />
+                    </div>
+                  </div>
+                  {/* Shipping Note */}
+                  <div className="mt-4 rounded-lg bg-blue-50 border border-blue-200 p-3">
+                    <div className="flex items-start gap-2">
+                      <svg className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="text-xs text-blue-900">
+                        <p className="font-semibold mb-1">Shipping Information</p>
+                        <p>• <strong>Free Shipping</strong> on orders ≥ ₹1,000</p>
+                        <p>• <strong>₹40 Shipping Fee</strong> for orders below ₹1,000</p>
+                        <p className="mt-1 text-blue-700">Shipping fee updates automatically based on your order total.</p>
+                      </div>
                     </div>
                   </div>
                 </div>
