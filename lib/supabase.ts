@@ -83,6 +83,7 @@ export interface Order {
   userId: string
   status: string
   totalAmount: number
+  shippingFee: number
   currency: string
   addressLine1: string
   addressLine2: string | null
@@ -109,4 +110,3 @@ export interface OrderItem {
   quantity: number
   createdAt: string
 }
-
