@@ -108,7 +108,7 @@ export default function Header() {
               aria-label="Millets N Joy home"
             >
               <Image
-                src="/Logo.jpeg"
+                src="/Logo.png"
                 alt="Millets N Joy"
                 fill
                 className="object-contain"

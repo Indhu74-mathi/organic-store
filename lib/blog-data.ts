@@ -369,7 +369,7 @@ Explore our range of millet-based products to easily incorporate these nutrition
         author: 'Millets N Joy',
         publishedDate: '2025-12-28',
         readingTime: 7,
-        heroImage: '/blog/weight-management.jpg',
+        heroImage: '/blog/Health-Benefits-of-Millet-1024x576.jpeg',
         content: `
 # Millets for Weight Loss: Your Natural Path to a Healthier Body
 

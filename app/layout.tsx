@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/Logo.jpeg',
+        url: '/Logo.png',
         width: 1200,
         height: 630,
         alt: 'Millets N Joy - Premium Organic Millet Products',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     title: 'Millets N Joy | Premium Organic Millet & Malt Products',
     description: 'Premium organic millet products for a healthy lifestyle. 100% natural and preservative-free.',
     creator: '@milletsnjoy',
-    images: ['/Logo.jpeg'],
+    images: ['/Logo.png'],
   },
   robots: {
     index: true,
@@ -72,9 +72,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/Logo.jpeg',
-    shortcut: '/Logo.jpeg',
-    apple: '/Logo.jpeg',
+    icon: '/Logo.png',
+    shortcut: '/Logo.png',
+    apple: '/Logo.png',
   },
   manifest: '/site.webmanifest',
 }
