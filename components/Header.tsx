@@ -111,7 +111,7 @@ export default function Header() {
                 src="/Logo.png"
                 alt="Millets N Joy"
                 fill
-                className="object-contain"
+                className="object-contain rounded-full"
                 priority
               />
             </Link>
@@ -185,7 +185,7 @@ export default function Header() {
               src="/Logo.jpeg"
               alt="Millets N Joy"
               fill
-              className="object-contain"
+              className="object-contain rounded-full"
               priority
             />
           </Link>

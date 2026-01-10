@@ -2,7 +2,7 @@ import AnimatedPage from '@/components/AnimatedPage'
 import FeaturedProductsSection from '@/components/sections/FeaturedProductsSection'
 import FloatingMillets from '@/components/sections/FloatingMillets'
 import MarqueeBanner from '@/components/ui/MarqueeBanner'
-import HeroImageCarousel from '@/components/sections/HeroImageCarousel'
+import CinematicHeroSection from '@/components/sections/CinematicHeroSection'
 import HeroSection from '@/components/sections/HeroSection'
 import TrustSection from '@/components/sections/TrustSection'
 import VideoPlaceholderSection from '@/components/sections/VideoPlaceholderSection'
@@ -22,7 +22,7 @@ export default function Home() {
         >
           <MarqueeBanner />
         </div>
-        <HeroImageCarousel />
+        <CinematicHeroSection />
         <HeroSection />
         <VideoPlaceholderSection />
         <WhyChooseUsSection />

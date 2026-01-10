@@ -14,7 +14,7 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
     "bcrypt": "^6.0.0",
-    "framer-motion": "^12.23.26",
+    "framer-motion": "^12.25.0",
     "jsonwebtoken": "^9.0.3",
     "next": "14.2.35",
     "razorpay": "^2.9.6",
