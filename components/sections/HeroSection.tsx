@@ -24,50 +24,29 @@ export default function HeroSection() {
           className="text-center"
         >
           {/* Premium badge */}
-          <motion.p
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: shouldReduceMotion ? 0 : 0.6,
-              delay: shouldReduceMotion ? 0 : 0.2,
-              ease: [0.4, 0, 0.2, 1],
-            }}
-            className="mb-6 inline-block rounded-full border border-primary-200/60 bg-white/80 px-5 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-primary-700 shadow-sm backdrop-blur-sm"
+          <div
+            className="mb-4 inline-block rounded-full border border-primary-200/60 bg-white/80 px-4 py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-primary-700 shadow-sm backdrop-blur-sm"
           >
             Premium Malt & Traditional Foods
-          </motion.p>
+          </div>
 
           {/* Main headline */}
-          <motion.h1
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: shouldReduceMotion ? 0 : 0.7,
-              delay: shouldReduceMotion ? 0 : 0.3,
-              ease: [0.4, 0, 0.2, 1],
-            }}
-            className="mb-8 text-3xl font-bold tracking-tight text-neutral-900 sm:text-6xl lg:text-7xl"
+          <h1
+            className="mb-6 text-2xl font-bold tracking-tight text-neutral-900 sm:text-6xl lg:text-7xl"
           >
             Nutritious malt and millet products
             <span className="block mt-2 text-primary-600">
               made with care
             </span>
-          </motion.h1>
+          </h1>
 
           {/* Supporting text */}
-          <motion.p
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: shouldReduceMotion ? 0 : 0.7,
-              delay: shouldReduceMotion ? 0 : 0.4,
-              ease: [0.4, 0, 0.2, 1],
-            }}
-            className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-neutral-600 sm:text-xl"
+          <p
+            className="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-neutral-600 sm:text-xl"
           >
             Carefully crafted malt, saadha podi, and other traditional millet products.
             Quality ingredients, authentic preparation, and delivered with complete transparency. Food you can trust.
-          </motion.p>
+          </p>
 
         </motion.div>
       </div>

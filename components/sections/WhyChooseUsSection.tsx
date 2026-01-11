@@ -13,19 +13,19 @@ export default function WhyChooseUsSection() {
             transparency and care.
           </p>
         </div>
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {valueCards.map((card) => (
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-3">
+          {valueCards.map((card, index) => (
             <div
               key={card.title}
-              className="group rounded-2xl border border-neutral-200/80 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/5"
+              className={`group rounded-xl border border-neutral-200/80 bg-white p-4 sm:p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-neutral-900/5 ${index === 2 ? 'col-span-2 justify-self-center w-full max-w-[200px] sm:max-w-none sm:col-span-1 sm:w-auto' : ''}`}
             >
-              <div className="mb-5 text-5xl transition-transform duration-300 group-hover:scale-110">
+              <div className="mb-3 sm:mb-5 text-3xl sm:text-5xl transition-transform duration-300 group-hover:scale-110">
                 {card.icon}
               </div>
-              <h3 className="mb-3 text-xl font-semibold text-neutral-900">
+              <h3 className="mb-2 sm:mb-3 text-sm sm:text-xl font-semibold text-neutral-900 leading-tight">
                 {card.title}
               </h3>
-              <p className="text-base leading-relaxed text-neutral-600">
+              <p className="text-xs sm:text-base leading-relaxed text-neutral-600">
                 {card.description}
               </p>
             </div>

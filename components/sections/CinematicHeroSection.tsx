@@ -90,34 +90,36 @@ export default function CinematicHeroSection() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 1.5, ease: 'easeInOut' }} // Slow crossfade
                 >
-                    {/* Background Image with Ken Burns Effect */}
-                    <motion.div
-                        className="absolute inset-0 z-0"
-                        initial={{ scale: 1.1, x: '0%', y: '0%' }}
-                        animate={{
-                            scale: 1.0,
-                            x: currentIndex % 2 === 0 ? '2%' : '-2%', // Subtle pan
-                            y: currentIndex % 3 === 0 ? '2%' : '-2%'
-                        }}
-                        transition={{ duration: 7, ease: 'linear' }} // Continuous movement
-                    >
-                        <Image
-                            src={slide.image}
-                            alt={slide.title}
-                            fill
-                            className="object-cover object-center"
-                            priority
-                            quality={100}
-                        />
-                    </motion.div>
+                    {/* Background Image with Ken Burns Effect - Clickable */}
+                    <Link href={slide.link} className="absolute inset-0 z-0 cursor-pointer">
+                        <motion.div
+                            className="relative h-full w-full"
+                            initial={{ scale: 1.1, x: '0%', y: '0%' }}
+                            animate={{
+                                scale: 1.0,
+                                x: currentIndex % 2 === 0 ? '2%' : '-2%', // Subtle pan
+                                y: currentIndex % 3 === 0 ? '2%' : '-2%'
+                            }}
+                            transition={{ duration: 7, ease: 'linear' }} // Continuous movement
+                        >
+                            <Image
+                                src={slide.image}
+                                alt={slide.title}
+                                fill
+                                className="object-cover object-center"
+                                priority
+                                quality={100}
+                            />
+                        </motion.div>
+                    </Link>
 
                     {/* Cinematic Overlay Gradient - Darker for readability over full photos */}
-                    <div className="absolute inset-0 z-10 bg-black/40 md:bg-black/30" />
-                    <div className={`absolute inset-0 z-10 bg-gradient-to-r ${slide.color} via-transparent to-transparent opacity-70 mix-blend-multiply`} />
-                    <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/20 to-black/30" />
+                    <div className="absolute inset-0 z-10 bg-black/40 md:bg-black/30 pointer-events-none" />
+                    <div className={`absolute inset-0 z-10 bg-gradient-to-r ${slide.color} via-transparent to-transparent opacity-70 mix-blend-multiply pointer-events-none`} />
+                    <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/20 to-black/30 pointer-events-none" />
 
                     {/* Text Content */}
-                    <div className="absolute inset-0 z-20 flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:px-32">
+                    <div className="absolute inset-0 z-20 flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:px-32 pointer-events-none">
                         <motion.div
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -150,22 +152,6 @@ export default function CinematicHeroSection() {
                             >
                                 {slide.description}
                             </motion.p>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1.4 }}
-                            >
-                                <Link
-                                    href={slide.link}
-                                    className="group inline-flex items-center gap-2 rounded-full bg-white px-6 md:px-8 py-3 md:py-4 text-sm md:text-base font-semibold text-black transition-all hover:bg-neutral-200 hover:scale-105 active:scale-95"
-                                >
-                                    Explore Product
-                                    <svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                    </svg>
-                                </Link>
-                            </motion.div>
                         </motion.div>
                     </div>
                 </motion.div>

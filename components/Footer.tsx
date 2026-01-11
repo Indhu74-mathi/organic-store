@@ -16,21 +16,21 @@ import GoogleMapEmbed from './ui/GoogleMapEmbed'
 export default function Footer() {
   return (
     <footer id="main-footer" className="bg-neutral-900 text-neutral-300 border-t border-neutral-800">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+        <div className="grid grid-cols-2 gap-8 lg:grid-cols-5">
           {/* Brand & Description */}
-          <div className="space-y-6">
+          <div className="space-y-4 col-span-2 sm:col-span-1">
             <h3 className="text-lg font-bold text-white tracking-tight">Millets N Joy</h3>
-            <p className="text-sm leading-relaxed text-neutral-400">
+            <p className="text-xs sm:text-sm leading-relaxed text-neutral-400">
               Premium malt, saadha podi, and traditional millet products. Your trusted source for quality products made with authentic preparation.
             </p>
           </div>
 
           {/* Contact Information */}
-          <div className="space-y-6">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-500">Contact Us</h4>
-            <div className="space-y-4 text-sm">
-              <div className="space-y-2">
+          <div className="space-y-4">
+            <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-neutral-500">Contact Us</h4>
+            <div className="space-y-3 text-xs sm:text-sm">
+              <div className="space-y-1">
                 <p className="font-medium text-neutral-200">Address</p>
                 <p className="text-neutral-400 leading-relaxed">
                   Ground Floor, No. 120/2,3,4,<br />
@@ -39,22 +39,30 @@ export default function Footer() {
                   Coimbatore - 641 001
                 </p>
               </div>
-              <div className="space-y-1">
-                <p className="font-medium text-neutral-200">Phone</p>
-                <a
-                  href="tel:+918072101964"
-                  className="text-neutral-400 hover:text-primary-400 transition-colors"
-                >
-                  +91 80721 01964
-                </a>
+              <div className="flex flex-col sm:flex-row gap-6">
+                <div className="space-y-1">
+                  <p className="font-medium text-neutral-200">Phone</p>
+                  <a
+                    href="tel:+918072101964"
+                    className="text-neutral-400 hover:text-primary-400 transition-colors block text-nowrap"
+                  >
+                    +91 80721 01964
+                  </a>
+                </div>
+                <div className="space-y-1">
+                  <p className="font-medium text-neutral-200">FSSAI</p>
+                  <p className="text-neutral-400 text-nowrap">
+                    22425042001030
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Map & Social Combined for spacing */}
-          <div className="space-y-6">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-500">Find Us</h4>
-            <div className="h-40 w-full rounded-2xl overflow-hidden ring-1 ring-neutral-800">
+          <div className="space-y-4">
+            <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-neutral-500">Find Us</h4>
+            <div className="h-32 sm:h-40 w-full rounded-xl overflow-hidden ring-1 ring-neutral-800">
               <GoogleMapEmbed height="100%" className="opacity-80 hover:opacity-100 transition-opacity grayscale-[0.5] hover:grayscale-0 duration-500" />
             </div>
           </div>
@@ -111,18 +119,12 @@ export default function Footer() {
                 <span>@milletsnjoy</span>
               </a>
 
-              <div className="pt-4 border-t border-neutral-800/50">
-                <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2 font-semibold">FSSAI Registration</p>
-                <p className="text-xs text-neutral-400 font-medium tracking-tight">
-                  Reg. No: 22425042001030
-                </p>
-              </div>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-neutral-800/50">
+        <div className="mt-8 pt-6 border-t border-neutral-800/50">
           <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
             <p className="text-xs text-neutral-500">
               © {new Date().getFullYear()} Millets N Joy. All rights reserved.

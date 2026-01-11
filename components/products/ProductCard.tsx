@@ -42,7 +42,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         draggable="false"
       >
         {/* Product Image */}
-        <div className="relative flex min-h-[200px] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-primary-50/30 via-neutral-50 to-primary-100/20 sm:min-h-[240px] select-none">
+        <div className="relative flex min-h-[150px] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-primary-50/30 via-neutral-50 to-primary-100/20 sm:min-h-[240px] select-none">
           {!imageError && product.image ? (
             <Image
               src={product.image}
@@ -53,20 +53,20 @@ export default function ProductCard({ product }: ProductCardProps) {
                 ? 'grayscale'
                 : 'group-hover:scale-[1.02]'
                 }`}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               onError={() => setImageError(true)}
             />
           ) : (
             // Fallback placeholder
-            <div className="flex h-full min-h-[200px] items-center justify-center sm:min-h-[240px]">
-              <div className="h-16 w-16 rounded-full bg-white/80 shadow-sm backdrop-blur-sm" />
+            <div className="flex h-full min-h-[150px] items-center justify-center sm:min-h-[240px]">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-white/80 shadow-sm backdrop-blur-sm" />
             </div>
           )}
 
           {/* Out of Stock badge */}
           {isOutOfStock && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className="inline-flex items-center rounded-full bg-neutral-600 px-3 py-1.5 text-xs font-semibold text-white shadow-lg shadow-neutral-600/30">
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10">
+              <span className="inline-flex items-center rounded-full bg-neutral-600 px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-semibold text-white shadow-lg shadow-neutral-600/30">
                 Out of Stock
               </span>
             </div>
@@ -74,8 +74,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Discount badge */}
           {!isOutOfStock && hasDiscount && (
-            <div className="absolute top-3 right-3 z-10">
-              <span className="inline-flex items-center rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg shadow-emerald-500/30">
+            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10">
+              <span className="inline-flex items-center rounded-full bg-emerald-500 px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-bold text-white shadow-lg shadow-emerald-500/30">
                 {product.discountPercent}% OFF
               </span>
             </div>
@@ -88,10 +88,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="flex flex-1 flex-col p-3 sm:p-5">
           {/* Category */}
-          <div className="mb-2">
-            <span className={`inline-block text-xs font-medium tracking-wide uppercase ${isOutOfStock
+          <div className="mb-1 sm:mb-2">
+            <span className={`inline-block text-[10px] sm:text-xs font-medium tracking-wide uppercase ${isOutOfStock
               ? 'text-neutral-400'
               : 'text-primary-600'
               }`}>
@@ -100,7 +100,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Product name */}
-          <h3 className={`mb-2 text-lg font-semibold leading-tight transition-colors duration-200 ${isOutOfStock
+          <h3 className={`mb-1 sm:mb-2 text-sm sm:text-lg font-semibold leading-tight transition-colors duration-200 ${isOutOfStock
             ? 'text-neutral-500'
             : 'text-neutral-900 group-hover:text-primary-700'
             }`}>
@@ -108,25 +108,24 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
 
           {/* Description (truncated) */}
-          <p className={`mb-4 flex-1 text-sm leading-relaxed line-clamp-2 ${isOutOfStock ? 'text-neutral-400' : 'text-neutral-600'
+          <p className={`mb-2 sm:mb-4 flex-1 text-xs sm:text-sm leading-relaxed line-clamp-2 ${isOutOfStock ? 'text-neutral-400' : 'text-neutral-600'
             }`}>
             {product.description}
           </p>
 
           {/* Pack Size / Variants Info */}
-          <div className="mb-4">
+          <div className="mb-2 sm:mb-4">
             {hasVariants ? (
-              <span className="inline-flex items-center rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600">
-                {product.variants!.length} sizes available
-                {/* Optional: Show range e.g. 200g - 1kg */}
+              <span className="inline-flex items-center rounded-md bg-neutral-100 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-medium text-neutral-600">
+                {product.variants!.length} sizes
               </span>
             ) : product.sizeGrams ? (
-              <span className="inline-flex items-center rounded-md bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-600">
+              <span className="inline-flex items-center rounded-md bg-neutral-100 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-medium text-neutral-600">
                 {product.sizeGrams}g
               </span>
             ) : (
               // Space filler if no size info
-              <span className="block h-6"></span>
+              <span className="block h-5 sm:h-6"></span>
             )}
           </div>
 
@@ -136,15 +135,15 @@ export default function ProductCard({ product }: ProductCardProps) {
               {/* Price Display */}
               {hasDiscount ? (
                 <div className="flex flex-col">
-                  <span className="text-xs text-neutral-400 line-through">
+                  <span className="text-[10px] sm:text-xs text-neutral-400 line-through">
                     ₹{originalPriceInRupees.toFixed(2)}
                   </span>
-                  <span className={`text-lg font-bold ${isOutOfStock ? 'text-neutral-500' : 'text-primary-700'}`}>
+                  <span className={`text-base sm:text-lg font-bold ${isOutOfStock ? 'text-neutral-500' : 'text-primary-700'}`}>
                     ₹{discountedPriceInRupees.toFixed(2)}
                   </span>
                 </div>
               ) : (
-                <span className={`text-lg font-bold ${isOutOfStock ? 'text-neutral-500' : 'text-neutral-900'}`}>
+                <span className={`text-base sm:text-lg font-bold ${isOutOfStock ? 'text-neutral-500' : 'text-neutral-900'}`}>
                   ₹{originalPriceInRupees.toFixed(2)}
                 </span>
               )}
@@ -152,7 +151,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
             {/* Low stock indicator */}
             {!isOutOfStock && totalStock < 20 && (
-              <span className="text-xs font-medium text-amber-600">
+              <span className="text-[10px] sm:text-xs font-medium text-amber-600">
                 Only {totalStock} left
               </span>
             )}
