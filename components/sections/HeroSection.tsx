@@ -1,28 +1,12 @@
 'use client'
 
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 
 export default function HeroSection() {
-  const shouldReduceMotion = useReducedMotion()
-  const { scrollY } = useScroll()
-
-  // Fade in as user scrolls down (starts at 100px, fully visible at 300px)
-  const opacity = useTransform(scrollY, [100, 300], [0, 1])
-  const y = useTransform(scrollY, [100, 300], [30, 0])
 
   return (
     <section className="relative py-16 sm:py-20 lg:py-28" style={{ border: 'none', boxShadow: 'none', outline: 'none' }}>
       <div className="relative mx-auto max-w-6xl px-6 sm:px-8 lg:px-12">
-        <motion.div
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-          animate={shouldReduceMotion ? { opacity: 1, y: 0 } : undefined}
-          style={shouldReduceMotion ? {} : { opacity, y }}
-          transition={{
-            duration: shouldReduceMotion ? 0 : 0.7,
-            ease: [0.4, 0, 0.2, 1],
-          }}
-          className="text-center"
-        >
+        <div className="text-center">
           {/* Premium badge */}
           <div
             className="mb-4 inline-block rounded-full border border-primary-200/60 bg-white/80 px-4 py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.15em] text-primary-700 shadow-sm backdrop-blur-sm"
@@ -47,8 +31,7 @@ export default function HeroSection() {
             Carefully crafted malt, saadha podi, and other traditional millet products.
             Quality ingredients, authentic preparation, and delivered with complete transparency. Food you can trust.
           </p>
-
-        </motion.div>
+        </div>
       </div>
     </section>
   )
