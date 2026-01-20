@@ -65,7 +65,7 @@ export default function CheckoutReviewContent() {
   const [isCreatingOrder, setIsCreatingOrder] = useState(false)
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
   const [isProcessingPaymentState, setIsProcessingPaymentState] = useState(false) // Track if payment is being processed
-  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod'>('razorpay')
+  // const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod'>('razorpay') // Removed COD
 
   // Address form state
   const [address, setAddress] = useState({
@@ -220,39 +220,7 @@ export default function CheckoutReviewContent() {
     try {
       const selectedCartItemIds = checkoutItems.map(item => item.cartItemId).filter((id): id is string => !!id)
 
-      // Handle COD orders
-      if (paymentMethod === 'cod') {
-        const response = await fetch('/api/orders/create-cod', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            selectedCartItemIds,
-            ...address,
-          }),
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          alert(data.error || data.message || 'Failed to create order. Please try again.')
-          return
-        }
-
-        // Clear checkout session
-        sessionStorage.removeItem('checkoutCartItemIds')
-
-        // Reload cart to remove purchased items
-        await reload()
-
-        // Redirect to order success page
-        router.push(`/orders/${data.orderId}?payment=cod`)
-        return
-      }
-
-      // Handle Razorpay orders (existing flow)
+      // Handle Razorpay orders (Only option now)
       // Step 1: Create order and Razorpay order
       const response = await fetch('/api/payments/create-order', {
         method: 'POST',
@@ -530,35 +498,14 @@ export default function CheckoutReviewContent() {
               {/* Payment Method */}
               <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
                 <h2 className="mb-4 text-xl font-semibold text-neutral-900">Payment Method</h2>
-                <div className="space-y-3">
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 p-4 hover:bg-neutral-50">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="razorpay"
-                      checked={paymentMethod === 'razorpay'}
-                      onChange={(e) => setPaymentMethod(e.target.value as 'razorpay' | 'cod')}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-neutral-900">Online Payment</div>
-                      <div className="text-sm text-neutral-500">Pay securely with Razorpay</div>
-                    </div>
-                  </label>
-                  <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 p-4 hover:bg-neutral-50">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="cod"
-                      checked={paymentMethod === 'cod'}
-                      onChange={(e) => setPaymentMethod(e.target.value as 'razorpay' | 'cod')}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500"
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium text-neutral-900">Cash on Delivery (COD)</div>
-                      <div className="text-sm text-neutral-500">Pay when you receive your order</div>
-                    </div>
-                  </label>
+                <div className="flex items-center gap-3 rounded-lg border border-primary-100 bg-primary-50/50 p-4">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full border border-primary-600 bg-primary-600">
+                    <div className="h-2 w-2 rounded-full bg-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-neutral-900">Online Payment</div>
+                    <div className="text-sm text-neutral-500">Pay securely with Razorpay</div>
+                  </div>
                 </div>
               </div>
 
@@ -727,9 +674,7 @@ export default function CheckoutReviewContent() {
                     ? 'Creating Order...'
                     : isProcessingPayment || isProcessingPaymentState
                       ? 'Processing Payment...'
-                      : paymentMethod === 'cod'
-                        ? 'Place Order (COD)'
-                        : 'Pay Now'}
+                      : 'Pay Now'}
                 </button>
                 <button
                   onClick={() => router.back()}

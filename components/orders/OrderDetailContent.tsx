@@ -530,8 +530,8 @@ export default function OrderDetailContent({ orderId }: OrderDetailContentProps)
                         Online Payment
                       </span>
                     ) : (
-                      <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
-                        Cash on Delivery (COD)
+                      <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-800">
+                        Payment Pending
                       </span>
                     )}
                   </div>
