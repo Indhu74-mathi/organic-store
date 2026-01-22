@@ -61,7 +61,47 @@ export default function FeaturedProductsSection() {
           inStock: p.inStock,
           stock: p.stock,
         }))
-        setProducts(mappedProducts)
+
+        // Map of product names/slugs to cinematic images
+        const productImageMap: Record<string, string> = {
+          // Existing Hero Images
+          'abc nutri mix': '/hero-images/abc-mix-v2.png',
+          'red banana malt': '/hero-images/red-banana-v2.png',
+          'chilli chatag': '/hero-images/chilli-chatag-v2.png',
+          'choco ragi millet': '/hero-images/choco-ragi-v2.png',
+          'masala stick': '/hero-images/masala-stick-v2.png',
+          'tangy tomato': '/hero-images/tangy-tomato-v2.png',
+
+          // New Cinematic Images
+          'nuts boost': '/hero-images/nuts-boost-cinematic.png',
+          'nutty beets': '/hero-images/nutty-beets-cinematic.png',
+          'mudavaattu kizhangu saadha podi': '/hero-images/mudavaattu-kizhangu-cinematic.png',
+          'almond elephant': '/hero-images/almond-elephant-cinematic.png',
+          'choco coated monkey': '/hero-images/choco-monkey-cinematic.png',
+          'coconut hearts': '/hero-images/coconut-hearts-cinematic.png',
+          'premium peanut balls': '/hero-images/peanut-balls-cinematic.png',
+          'peanut balls': '/hero-images/peanut-balls-cinematic.png', // Fallback
+        }
+
+        const productsWithCinematicImages = mappedProducts.map(product => {
+          const normalizedName = product.name.toLowerCase().trim()
+          // Check for exact match or partial match for mapped images
+          let cinematicImage = product.image
+
+          for (const [key, value] of Object.entries(productImageMap)) {
+            if (normalizedName.includes(key)) {
+              cinematicImage = value
+              break
+            }
+          }
+
+          return {
+            ...product,
+            image: cinematicImage
+          }
+        })
+
+        setProducts(productsWithCinematicImages)
       } catch (err) {
         console.error('[Featured Products] Failed to load products:', err)
       } finally {
