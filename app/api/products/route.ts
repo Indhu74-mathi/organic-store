@@ -5,6 +5,7 @@ import { getProductImages } from '@/lib/products-server'
 
 // Node runtime is more stable for Supabase calls here
 // export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
 
 /**
  * GET /api/products
