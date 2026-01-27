@@ -84,6 +84,9 @@ export async function GET(_req: NextRequest) {
       return NextResponse.json({ products: [] })
     }
 
+    // Get base URL from environment
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
     // Helper function for variant categories (Edge runtime compatible, case-insensitive)
     const hasVariants = (category: string) => {
       if (!category) return false
@@ -91,72 +94,95 @@ export async function GET(_req: NextRequest) {
       return normalized === 'malt' || normalized === 'saadha podi'
     }
 
-    // Map products to API response format
-    const mappedProducts = products.map((p: any) => {
+    // Helper function to get shipping weight
+    const getShippingWeight = (category: string, sizeGrams?: number) => {
+      const normalized = category.trim().toLowerCase()
+      // For Malt and Saadha Podi, use variant sizeGrams if available
+      if ((normalized === 'malt' || normalized === 'saadha podi') && sizeGrams) {
+        return sizeGrams
+      }
+      // Default weight for Millet and other categories
+      return 300
+    }
+
+    // Flatten products - expand variants into separate product entries
+    const flattenedProducts: any[] = []
+
+    for (const p of products) {
       const usesVariants = hasVariants(p.category)
       const variants = p.ProductVariant || []
 
-      // For variant-based products: check if any variant has stock
-      // For non-variant products: use product stock
-      let inStock: boolean
-      let stock: number
-
-      if (usesVariants) {
-        const hasStock = variants.some((v: any) => v.stock > 0)
-        const totalStock = variants.reduce((sum: number, v: any) => sum + (v.stock || 0), 0)
-        inStock = p.isActive && hasStock
-        stock = totalStock
-      } else {
-        inStock = p.isActive && p.stock > 0
-        stock = p.stock
-      }
-
-      // Apply excludeOutOfStock filter
-      if (excludeOutOfStock && !includeOutOfStock && !inStock) {
-        return null
-      }
-
-      // Discover images resilience
+      // Discover images
       let allImages: string[] = []
       try {
-        // Use staticly imported getProductImages
         allImages = getProductImages(p.category, p.name, p.imageUrl)
       } catch (e) {
         console.error('Error discovering images for', p.name, e)
       }
 
-      const finalImage = allImages.length > 0 ? allImages[0] : p.imageUrl
+      const primaryImage = allImages.length > 0 ? allImages[0] : p.imageUrl
+      const additionalImages = allImages.slice(1) // All images except the first one
 
-      return {
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        description: p.description,
-        price: p.price / 100, // Convert paise to rupees - base price for non-variant products
-        discountPercent: p.discountPercent,
-        imageUrl: finalImage,
-        category: p.category,
-        stock: stock,
-        inStock: inStock,
-        isActive: p.isActive,
-        image: finalImage,
-        images: allImages,
-        // Include variants for variant-based products
-        ...(usesVariants && {
-          variants: variants.map((v: any) => ({
-            id: v.id,
-            sizeGrams: v.sizeGrams,
-            price: v.price / 100, // Convert paise to rupees
-            stock: v.stock,
-            inStock: v.stock > 0,
-          })),
-        }),
+      if (usesVariants && variants.length > 0) {
+        // Create separate product entry for each variant
+        for (const variant of variants) {
+          const variantPrice = variant.price / 100 // Convert paise to rupees
+          const salePrice = p.discountPercent > 0
+            ? variantPrice - (variantPrice * p.discountPercent / 100)
+            : variantPrice
+          const availability = variant.stock > 0 ? 1 : 0
+
+          // Skip if excludeOutOfStock is true and variant is out of stock
+          if (excludeOutOfStock && !includeOutOfStock && availability === 0) {
+            continue
+          }
+
+          flattenedProducts.push({
+            product_id: `${p.id}-${variant.id}`,
+            title: `${p.name} - ${variant.sizeGrams}g`,
+            description: p.description,
+            original_price: variantPrice,
+            sale_price: parseFloat(salePrice.toFixed(2)),
+            category: p.category,
+            shipping_weight: variant.sizeGrams,
+            availability: availability,
+            link: `${baseUrl}/shop/${p.slug}`,
+            primary_image: primaryImage,
+            additional_images: additionalImages,
+          })
+        }
+      } else {
+        // Regular product (non-variant)
+        const originalPrice = p.price / 100 // Convert paise to rupees
+        const salePrice = p.discountPercent > 0
+          ? originalPrice - (originalPrice * p.discountPercent / 100)
+          : originalPrice
+        const availability = p.stock > 0 ? 1 : 0
+
+        // Skip if excludeOutOfStock is true and product is out of stock
+        if (excludeOutOfStock && !includeOutOfStock && availability === 0) {
+          continue
+        }
+
+        flattenedProducts.push({
+          product_id: p.id,
+          title: p.name,
+          description: p.description,
+          original_price: originalPrice,
+          sale_price: parseFloat(salePrice.toFixed(2)),
+          category: p.category,
+          shipping_weight: getShippingWeight(p.category),
+          availability: availability,
+          link: `${baseUrl}/shop/${p.slug}`,
+          primary_image: primaryImage,
+          additional_images: additionalImages,
+        })
       }
-    }).filter((p: any): p is NonNullable<typeof p> => p !== null)
+    }
 
     // Cache public read-only endpoint for 60s, allow stale for 300s
     return NextResponse.json(
-      { products: mappedProducts },
+      { products: flattenedProducts },
       {
         headers: {
           'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
