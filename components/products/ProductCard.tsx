@@ -115,7 +115,11 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Pack Size / Variants Info */}
           <div className="mb-2 sm:mb-4">
-            {hasVariants ? (
+            {(product as any).variantCount && (product as any).variantCount > 1 ? (
+              <span className="inline-flex items-center rounded-md bg-primary-50 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-medium text-primary-700 border border-primary-200">
+                {(product as any).variantCount} sizes available
+              </span>
+            ) : hasVariants ? (
               <span className="inline-flex items-center rounded-md bg-neutral-100 px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs font-medium text-neutral-600">
                 {product.variants!.length} sizes
               </span>

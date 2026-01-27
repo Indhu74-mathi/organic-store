@@ -57,14 +57,27 @@ export default function ShopPageContent() {
           }
         })
 
-        // Deduplicate products by name (keep only first occurrence of each base product)
-        const uniqueProducts = mappedProducts.reduce((acc: Product[], product) => {
-          const exists = acc.some(p => p.name === product.name)
-          if (!exists) {
-            acc.push(product)
-          }
+        // Group products by name and track variant count + lowest price
+        const productGroups = mappedProducts.reduce((acc: Map<string, Product[]>, product) => {
+          const existing = acc.get(product.name) || []
+          existing.push(product)
+          acc.set(product.name, existing)
           return acc
-        }, [])
+        }, new Map())
+
+        // Create unique products with variant count and lowest price
+        const uniqueProducts = Array.from(productGroups.entries()).map(([_, variants]) => {
+          // Find the variant with the lowest price
+          const lowestPriceVariant = variants.reduce((lowest: Product, current: Product) =>
+            current.price < lowest.price ? current : lowest
+          )
+
+          // Return the lowest price variant with variant count added
+          return {
+            ...lowestPriceVariant,
+            variantCount: variants.length,
+          }
+        })
 
         const productsWithCinematicImages = uniqueProducts.map(product => ({
           ...product,
