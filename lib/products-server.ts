@@ -121,13 +121,6 @@ export function getProductImages(category: string, name: string, mainImageUrl?: 
         }
     }
 
-    // Final cleanup: path normalization, deduplication, and conversion to GitHub URLs
-    const githubBase = 'https://raw.githubusercontent.com/Kabilan-0809/organic-store/main/public'
-
-    return Array.from(new Set(images.map(img => {
-        const normalized = img.startsWith('/') ? img : '/' + img
-        // Encode URI components but preserve slashes
-        const urlPath = normalized.split('/').map(part => encodeURIComponent(part)).join('/')
-        return `${githubBase}${urlPath}`
-    })))
+    // Final cleanup: path normalization and deduplication
+    return Array.from(new Set(images.map(img => img.startsWith('/') ? img : '/' + img)))
 }
