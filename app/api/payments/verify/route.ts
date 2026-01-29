@@ -234,7 +234,7 @@ export async function POST(_req: NextRequest) {
                 razorpayPaymentId,
                 razorpaySignature,
                 paidAt: new Date().toISOString(),
-                shippingFee: orderData.shippingFee ?? 0,
+                shippingFee: expectedShippingFee,
             })
             .select()
             .single()

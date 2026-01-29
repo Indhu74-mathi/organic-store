@@ -45,6 +45,7 @@ export default function FeaturedProductsSection() {
           description: string
           original_price: number
           sale_price: number
+          discount_percent: number
           category: string
           primary_image: string
           additional_images: string[]
@@ -58,8 +59,8 @@ export default function FeaturedProductsSection() {
             slug: '', // Not needed for featured section
             name: cleanTitle,
             description: p.description,
-            price: p.sale_price, // Use sale_price for display
-            discountPercent: null,
+            price: p.original_price,
+            discountPercent: p.discount_percent,
             category: p.category,
             image: p.primary_image,
             images: p.additional_images,

@@ -33,6 +33,7 @@ export default function ShopPageContent() {
           description: string
           original_price: number
           sale_price: number
+          discount_percent: number
           category: string
           primary_image: string
           additional_images: string[]
@@ -47,8 +48,8 @@ export default function ShopPageContent() {
             slug: p.link ? p.link.split('/').pop() || '' : '',
             name: cleanTitle,
             description: p.description,
-            price: p.sale_price,
-            discountPercent: null,
+            price: p.original_price,
+            discountPercent: p.discount_percent,
             category: p.category || 'Uncategorized',
             image: p.primary_image,
             images: p.additional_images,
